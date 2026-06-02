@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rams Tracker">
+<title>Rams 100 Shot Tracker</title>
+<style>
+:root{
+  --green:#1a5c2a;--gmid:#2d8a42;--gbright:#4caf68;
+  --gold:#c4973a;--gold-l:#e8b84b;
+  --bg:#f0f4f0;--card:#ffffff;--border:#d4e8d4;
+  --text:#1a2a1a;--dim:#5a6e5a;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);min-height:100vh;padding-bottom:60px;}
+.hdr{background:var(--green);padding:16px 16px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.hdr h1{font-size:18px;font-weight:700;color:var(--gold-l);letter-spacing:.5px;}
+.hdr p{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px;}
+.screen{display:none;padding:16px;}
+.screen.active{display:block;}
+.login-card{background:var(--card);border-radius:12px;padding:24px 20px;margin-top:8px;border:1px solid var(--border);}
+.login-card h2{font-size:20px;font-weight:700;color:var(--green);margin-bottom:4px;}
+.login-card p{font-size:13px;color:var(--dim);margin-bottom:20px;}
+.player-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.player-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s;}
+.player-btn.selected{background:var(--green);border-color:var(--green);}
+.player-btn.selected .pb-name,.player-btn.selected .pb-pos{color:white;}
+.pb-name{font-size:15px;font-weight:600;color:var(--text);}
+.pb-pos{font-size:11px;color:var(--dim);margin-top:2px;}
+.group-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin:16px 0 8px;}
+.btn-start{width:100%;margin-top:20px;background:var(--green);color:white;border:none;border-radius:8px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;}
+.btn-start:disabled{opacity:.4;}
+.nav{display:flex;background:var(--green);}
+.nav-btn{flex:1;padding:11px 4px;border:none;background:transparent;color:rgba(255,255,255,.6);font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;}
+.nav-btn.active{color:var(--gold-l);border-bottom-color:var(--gold);}
+.date-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:8px;padding:12px 14px;margin-bottom:12px;border:1px solid var(--border);}
+.date-row label{font-size:12px;color:var(--dim);font-weight:600;letter-spacing:1px;text-transform:uppercase;}
+.date-row input{font-size:14px;border:none;color:var(--text);font-weight:600;background:transparent;outline:none;}
+.load-btn{background:var(--green);color:white;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;}
+.progress-wrap{margin-bottom:14px;}
+.progress-top{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-bottom:6px;}
+.progress-top strong{color:var(--green);}
+.pbar{height:10px;background:var(--border);border-radius:5px;overflow:hidden;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--green),var(--gbright));border-radius:5px;transition:width .3s;}
+.totals-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.tcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;}
+.tcard-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
+.tcard-val{font-size:28px;font-weight:700;color:var(--green);line-height:1;}
+.tcard-val.done{color:#1a9e40;}
+.shot-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.shot-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+.shot-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.shot-num-name{display:flex;align-items:center;gap:8px;}
+.snum{width:26px;height:26px;border-radius:50%;background:var(--green);color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sname{font-size:13px;font-weight:600;color:var(--text);}
+.smakes{font-size:20px;font-weight:700;color:var(--green);}
+.make-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;}
+.mb{height:34px;border-radius:5px;border:1.5px solid var(--border);background:var(--bg);font-size:11px;font-weight:600;color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;}
+.mb.on{background:var(--green);border-color:var(--green);color:white;}
+.mb:active{transform:scale(.88);}
+.bonus-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;}
+.bonus-card h3{font-size:13px;font-weight:700;color:var(--green);margin-bottom:4px;}
+.bonus-card p{font-size:11px;color:var(--dim);margin-bottom:10px;}
+.bonus-row{display:flex;align-items:center;gap:12px;}
+.bonus-row label{font-size:13px;color:var(--text);}
+.bonus-row input{width:80px;padding:8px;border:1.5px solid var(--border);border-radius:6px;font-size:20px;font-weight:700;color:var(--green);text-align:center;outline:none;}
+.notes-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;}
+.notes-card label{font-size:12px;font-weight:700;color:var(--green);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:8px;}
+.notes-card textarea{width:100%;border:1px solid var(--border);border-radius:6px;padding:10px;font-size:13px;color:var(--text);resize:vertical;min-height:60px;outline:none;font-family:inherit;}
+.save-btn{width:100%;background:var(--green);color:white;border:none;border-radius:10px;padding:16px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;}
+.save-btn:active{background:var(--gmid);}
+.save-btn:disabled{opacity:.5;}
+.reset-btn{width:100%;background:transparent;color:var(--dim);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;}
+.switch-btn{width:100%;background:transparent;color:var(--green);border:1px solid var(--green);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;}
+.hist-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
+.hist-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.hist-date{font-size:14px;font-weight:700;color:var(--text);}
+.hist-total{font-size:26px;font-weight:700;color:var(--green);}
+.hist-sub{font-size:11px;color:var(--dim);}
+.hist-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:rgba(26,158,64,.12);color:#1a9e40;margin-top:2px;display:inline-block;}
+.hist-shots{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:8px;}
+.hs-cell{background:var(--bg);border-radius:4px;padding:5px 3px;text-align:center;}
+.hs-n{font-size:8px;color:var(--dim);margin-bottom:2px;line-height:1.3;}
+.hs-v{font-size:15px;font-weight:700;color:var(--green);}
+.hist-note{font-size:11px;color:var(--dim);margin-top:8px;font-style:italic;border-top:1px solid var(--border);padding-top:6px;}
+.lb-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+.lb-row{display:flex;align-items:center;padding:13px 14px;border-bottom:1px solid var(--border);}
+.lb-row:last-child{border-bottom:none;}
+.lb-row.me{background:rgba(26,92,42,.06);}
+.lb-rank{font-size:20px;font-weight:700;color:var(--dim);min-width:36px;}
+.lb-rank.top{color:var(--gold);}
+.lb-info{flex:1;}
+.lb-name{font-size:14px;font-weight:700;color:var(--text);}
+.lb-group{font-size:11px;color:var(--dim);margin-top:1px;}
+.lb-makes{font-size:24px;font-weight:700;color:var(--green);}
+.lb-makes-label{font-size:10px;color:var(--dim);}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green);color:white;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.toast.show{opacity:1;}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.empty{text-align:center;padding:48px 20px;color:var(--dim);font-size:14px;}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:12px;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>🏀 Rams 100 Shot Tracker</h1>
+  <p id="hdr-sub">Murrieta Mesa · 2026–27</p>
+</div>
+
+<!-- LOGIN -->
+<div class="screen active" id="screen-login">
+  <div class="login-card">
+    <h2>Who's working today?</h2>
+    <p>Select your name to load your personalized workout.</p>
+    <div class="group-label">Guards</div>
+    <div class="player-grid" id="guard-grid"></div>
+    <div class="group-label">Bigs</div>
+    <div class="player-grid" id="big-grid"></div>
+    <button class="btn-start" id="btn-start" disabled onclick="startSession()">Start Workout →</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-shell" style="display:none">
+  <div class="nav">
+    <button class="nav-btn active" id="nav-today" onclick="showTab('tracker',this)">Today</button>
+    <button class="nav-btn" id="nav-history" onclick="showTab('history',this);loadHistory()">History</button>
+    <button class="nav-btn" id="nav-lb" onclick="showTab('leaderboard',this);loadLeaderboard()">🏆 Board</button>
+  </div>
+
+  <!-- TODAY TAB -->
+  <div class="screen active" id="screen-tracker">
+    <div style="padding-top:14px">
+      <button class="switch-btn" onclick="switchPlayer()">← Switch Player</button>
+      <div class="date-row">
+        <label>Date</label>
+        <input type="date" id="date-input">
+        <button class="load-btn" onclick="loadTodayData()">Load</button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-top"><span>Progress to 100 makes</span><strong id="prog-label">0 / 100</strong></div>
+        <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+      </div>
+      <div class="totals-grid">
+        <div class="tcard"><div class="tcard-label">Station</div><div class="tcard-val" id="t-station">0</div></div>
+        <div class="tcard"><div class="tcard-label">Bonus</div><div class="tcard-val" id="t-bonus">0</div></div>
+        <div class="tcard"><div class="tcard-label">Total</div><div class="tcard-val" id="t-total">0</div></div>
+      </div>
+      <div class="shot-list" id="shot-list"></div>
+      <div class="bonus-card">
+        <h3>Bonus Makes — Reach 100</h3>
+        <p>Finished stations but under 100? Add free choice makes here.</p>
+        <div class="bonus-row">
+          <label>Extra makes:</label>
+          <input type="number" id="bonus-input" min="0" max="100" value="0" oninput="updateTotals()">
+        </div>
+      </div>
+      <div class="notes-card">
+        <label>Focus / Notes</label>
+        <textarea id="notes-input" placeholder="What are you working on today? Any PRs to beat?"></textarea>
+      </div>
+      <button class="save-btn" id="save-btn" onclick="saveSession()">Save Session ✓</button>
+      <button class="reset-btn" onclick="resetToday()">Reset Today</button>
+    </div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div class="screen" id="screen-history">
+    <div style="padding-top:14px">
+      <div id="history-content"><div class="empty"><div class="empty-icon">📋</div>Loading history...</div></div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD TAB -->
+  <div class="screen" id="screen-leaderboard">
+    <div style="padding-top:14px">
+      <div id="lb-content"><div class="empty"><div class="empty-icon">🏆</div>Loading leaderboard...</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// CONFIG — Update SCRIPT_URL with your Apps Script web app URL
+// ============================================================
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-xO2z6PWFi2MzWRqXTc8pxqu9W1_tQFfbNFx-KDgn64aIkXfyA5UlKfCMF7XlqIfj/exec';
+
+const PLAYERS = [
+  { name: 'Moana',     group: 'Guard' },
+  { name: 'Jazae',     group: 'Guard' },
+  { name: 'Josephine', group: 'Guard' },
+  { name: 'Malia',     group: 'Guard' },
+  { name: 'Alise',     group: 'Guard' },
+  { name: 'Khloe',     group: 'Guard' },
+  { name: 'Naomi',     group: 'Guard' },
+  { name: 'Daney',     group: 'Guard' },
+  { name: 'Kai',       group: 'Guard' },
+  { name: 'Serena',    group: 'Big'   },
+  { name: 'Aly',       group: 'Big'   },
+];
+
+const GUARD_SHOTS = [
+  'Attack Move Layups off Two',
+  'Floaters',
+  'Short Corner Pull-Up',
+  'Right Elbow Pull-Up',
+  'Left Elbow Pull-Up',
+  '3PT Around the Horn',
+  "Pick a Spot 3's",
+  "Pick a Spot 3's (2)",
+  "Transition 3's",
+  'Free Throws',
+];
+
+const BIG_SHOTS = [
+  'Block Move Layups',
+  'Block Hook Shots',
+  'Right Short Corner Face-Up',
+  'Left Short Corner Face-Up',
+  'Right Elbow Face-Up',
+  'Left Elbow Face-Up',
+  '3PT Around the Horn',
+  "Pick a Spot 3's",
+  "Pick a Spot 3's (2)",
+  'Free Throws',
+];
+
+let currentPlayer = null;
+let makes = Array(10).fill(0);
+
+// ---- API CALLS ----
+async function apiCall(params) {
+  try {
+    const url = SCRIPT_URL + '?' + new URLSearchParams(params).toString();
+    const res = await fetch(url, { method: 'GET' });
+    const text = await res.text();
+    return JSON.parse(text);
+  } catch(e) {
+    console.error('API error:', e);
+    return { success: false, error: e.toString() };
+  }
+}
+
+// ---- LOGIN ----
+function buildLogin() {
+  const guards = PLAYERS.filter(p => p.group === 'Guard');
+  const bigs   = PLAYERS.filter(p => p.group === 'Big');
+  document.getElementById('guard-grid').innerHTML = guards.map(p =>
+    `<div class="player-btn" onclick="selectPlayer('${p.name}','${p.group}',this)">
+      <div class="pb-name">${p.name}</div>
+      <div class="pb-pos">${p.group}</div>
+    </div>`
+  ).join('');
+  document.getElementById('big-grid').innerHTML = bigs.map(p =>
+    `<div class="player-btn" onclick="selectPlayer('${p.name}','${p.group}',this)">
+      <div class="pb-name">${p.name}</div>
+      <div class="pb-pos">${p.group}</div>
+    </div>`
+  ).join('');
+}
+
+function selectPlayer(name, group, el) {
+  currentPlayer = { name, group };
+  document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn-start').disabled = false;
+}
+
+function startSession() {
+  if (!currentPlayer) return;
+  document.getElementById('screen-login').style.display = 'none';
+  document.getElementById('app-shell').style.display = 'block';
+  document.getElementById('hdr-sub').textContent = currentPlayer.name + ' · ' + currentPlayer.group + ' Workout';
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('date-input').value = today;
+  makes = Array(10).fill(0);
+  buildShots();
+  loadTodayData();
+}
+
+function switchPlayer() {
+  currentPlayer = null;
+  makes = Array(10).fill(0);
+  document.getElementById('app-shell').style.display = 'none';
+  document.getElementById('screen-login').style.display = 'block';
+  document.getElementById('screen-login').classList.add('active');
+  document.getElementById('hdr-sub').textContent = 'Murrieta Mesa · 2026–27';
+  document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('btn-start').disabled = true;
+}
+
+// ---- SHOTS ----
+function buildShots() {
+  const shots = currentPlayer.group === 'Guard' ? GUARD_SHOTS : BIG_SHOTS;
+  document.getElementById('shot-list').innerHTML = shots.map((shot, idx) => `
+    <div class="shot-card">
+      <div class="shot-top">
+        <div class="shot-num-name">
+          <div class="snum">${idx+1}</div>
+          <div class="sname">${shot}</div>
+        </div>
+        <div class="smakes" id="cnt-${idx}">0</div>
+      </div>
+      <div class="make-grid">
+        ${Array.from({length:10},(_,b) =>
+          `<div class="mb" id="mb-${idx}-${b}" onclick="toggleMake(${idx},${b})">${b+1}</div>`
+        ).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleMake(shotIdx, btnIdx) {
+  makes[shotIdx] = btnIdx < makes[shotIdx] ? btnIdx : btnIdx + 1;
+  updateRow(shotIdx);
+  updateTotals();
+}
+
+function updateRow(i) {
+  const cnt = makes[i];
+  const el = document.getElementById('cnt-'+i);
+  if (el) el.textContent = cnt;
+  for (let b = 0; b < 10; b++) {
+    const btn = document.getElementById('mb-'+i+'-'+b);
+    if (btn) btn.classList.toggle('on', b < cnt);
+  }
+}
+
+function updateTotals() {
+  const station = makes.reduce((a,b) => a+b, 0);
+  const bonus = parseInt(document.getElementById('bonus-input').value) || 0;
+  const total = station + bonus;
+  document.getElementById('t-station').textContent = station;
+  document.getElementById('t-bonus').textContent = bonus;
+  const tv = document.getElementById('t-total');
+  tv.textContent = total;
+  tv.className = 'tcard-val' + (total >= 100 ? ' done' : '');
+  document.getElementById('pfill').style.width = Math.min(100, (total/100)*100) + '%';
+  document.getElementById('prog-label').textContent = total + ' / 100';
+}
+
+// ---- SAVE ----
+async function saveSession() {
+  const btn = document.getElementById('save-btn');
+  btn.innerHTML = '<span class="spinner"></span>Saving...';
+  btn.disabled = true;
+  const data = {
+    action: 'save',
+    player: currentPlayer.name,
+    date: document.getElementById('date-input').value,
+    makes: JSON.stringify(makes),
+    bonusMakes: parseInt(document.getElementById('bonus-input').value) || 0,
+    notes: document.getElementById('notes-input').value
+  };
+  const result = await apiCall(data);
+  btn.innerHTML = 'Save Session ✓';
+  btn.disabled = false;
+  if (result.success) {
+    showToast('Saved! ' + result.grandTotal + ' total makes ✓');
+  } else {
+    showToast('Error saving — try again');
+    console.error(result.error);
+  }
+}
+
+// ---- LOAD TODAY ----
+async function loadTodayData() {
+  const date = document.getElementById('date-input').value;
+  const result = await apiCall({ action: 'load', player: currentPlayer.name });
+  if (!result.success || !result.rows || !result.rows.length) return;
+  const row = result.rows.find(x => x.date === date);
+  if (!row) return;
+  makes = (row.makes || []).map(Number);
+  for (let i = 0; i < 10; i++) updateRow(i);
+  document.getElementById('bonus-input').value = row.bonusMakes || 0;
+  document.getElementById('notes-input').value = row.notes || '';
+  updateTotals();
+  showToast('Session loaded');
+}
+
+function resetToday() {
+  if (!confirm('Reset today\'s session?')) return;
+  makes = Array(10).fill(0);
+  for (let i = 0; i < 10; i++) updateRow(i);
+  document.getElementById('bonus-input').value = 0;
+  document.getElementById('notes-input').value = '';
+  updateTotals();
+}
+
+// ---- HISTORY ----
+async function loadHistory() {
+  document.getElementById('history-content').innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Loading...</div>';
+  const result = await apiCall({ action: 'load', player: currentPlayer.name });
+  if (!result.success || !result.rows || !result.rows.length) {
+    document.getElementById('history-content').innerHTML = '<div class="empty"><div class="empty-icon">📋</div>No sessions yet — start shooting!</div>';
+    return;
+  }
+  const shots = currentPlayer.group === 'Guard' ? GUARD_SHOTS : BIG_SHOTS;
+  const shortName = s => s.replace("Pick a Spot 3's (2)","Spot 3's 2")
+    .replace("Pick a Spot 3's","Spot 3's")
+    .replace("Transition 3's","Trans 3's")
+    .replace('3PT Around the Horn','3PT Horn')
+    .replace('Attack Move Layups off Two','Layups')
+    .replace('Short Corner Pull-Up','Short Cnr')
+    .replace('Right Elbow Pull-Up','R Elbow')
+    .replace('Left Elbow Pull-Up','L Elbow')
+    .replace('Block Move Layups','Blk Layup')
+    .replace('Block Hook Shots','Blk Hook')
+    .replace('Right Short Corner Face-Up','R Shrt Cnr')
+    .replace('Left Short Corner Face-Up','L Shrt Cnr')
+    .replace('Right Elbow Face-Up','R Elbow')
+    .replace('Left Elbow Face-Up','L Elbow')
+    .replace('Free Throws','FT');
+  document.getElementById('history-content').innerHTML =
+    `<div class="section-title">${currentPlayer.name}'s Sessions</div>` +
+    result.rows.map(row => `
+      <div class="hist-card">
+        <div class="hist-top">
+          <div>
+            <div class="hist-date">${row.date}</div>
+            <div class="hist-sub">Station: ${row.stationTotal} + Bonus: ${row.bonusMakes}</div>
+            ${row.grandTotal >= 100 ? '<div class="hist-badge">100 ✓</div>' : ''}
+          </div>
+          <div style="text-align:right">
+            <div class="hist-total">${row.grandTotal}</div>
+            <div style="font-size:10px;color:var(--dim)">makes</div>
+          </div>
+        </div>
+        <div class="hist-shots">
+          ${shots.map((s,i) => `
+            <div class="hs-cell">
+              <div class="hs-n">${shortName(s)}</div>
+              <div class="hs-v">${(row.makes && row.makes[i]) || 0}</div>
+            </div>
+          `).join('')}
+        </div>
+        ${row.notes ? `<div class="hist-note">${row.notes}</div>` : ''}
+      </div>
+    `).join('');
+}
+
+// ---- LEADERBOARD ----
+async function loadLeaderboard() {
+  document.getElementById('lb-content').innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Loading...</div>';
+  const result = await apiCall({ action: 'leaderboard' });
+  if (!result.success || !result.rows) {
+    document.getElementById('lb-content').innerHTML = '<div class="empty"><div class="empty-icon">🏆</div>No data yet — get to work!</div>';
+    return;
+  }
+  const rows = result.rows.sort((a,b) => b.totalMakes - a.totalMakes);
+  document.getElementById('lb-content').innerHTML = `
+    <div class="section-title">Total Makes — Summer 2026</div>
+    <div class="lb-card">
+      ${rows.map((row, i) => `
+        <div class="lb-row ${row.player === currentPlayer?.name ? 'me' : ''}">
+          <div class="lb-rank ${i < 3 ? 'top' : ''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+          <div class="lb-info">
+            <div class="lb-name">${row.player}${row.player === currentPlayer?.name ? ' 👈' : ''}</div>
+            <div class="lb-group">${row.group} · ${row.sessions} sessions</div>
+          </div>
+          <div style="text-align:right">
+            <div class="lb-makes">${row.totalMakes}</div>
+            <div class="lb-makes-label">makes</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ---- UI HELPERS ----
+function showTab(tab, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-'+tab).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+buildLogin();
+</script>
+</body>
+</html>
