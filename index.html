@@ -31,6 +31,9 @@ body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 .pb-name{font-size:15px;font-weight:600;color:var(--text);}
 .pb-pos{font-size:11px;color:var(--dim);margin-top:2px;}
 .group-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin:16px 0 8px;}
+.jv-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin:16px 0 8px;}
+.jv-divider{border:none;border-top:1px dashed var(--border);margin:16px 0 4px;}
+.jv-note{font-size:11px;color:var(--dim);margin-bottom:8px;font-style:italic;}
 .btn-start{width:100%;margin-top:20px;background:var(--green);color:white;border:none;border-radius:8px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;}
 .btn-start:disabled{opacity:.4;}
 .nav{display:flex;background:var(--green);}
@@ -90,6 +93,7 @@ body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 .lb-row{display:flex;align-items:center;padding:13px 14px;border-bottom:1px solid var(--border);}
 .lb-row:last-child{border-bottom:none;}
 .lb-row.me{background:rgba(26,92,42,.06);}
+.lb-row.jv-row{opacity:.85;}
 .lb-rank{font-size:20px;font-weight:700;color:var(--dim);min-width:36px;}
 .lb-rank.top{color:var(--gold);}
 .lb-info{flex:1;}
@@ -97,6 +101,7 @@ body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 .lb-group{font-size:11px;color:var(--dim);margin-top:1px;}
 .lb-makes{font-size:24px;font-weight:700;color:var(--green);}
 .lb-makes-label{font-size:10px;color:var(--dim);}
+.lb-section-hdr{background:var(--bg);padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--border);}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green);color:white;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
 .toast.show{opacity:1;}
 .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
@@ -122,7 +127,11 @@ body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
     <div class="player-grid" id="guard-grid"></div>
     <div class="group-label">Bigs</div>
     <div class="player-grid" id="big-grid"></div>
-    <button class="btn-start" id="btn-start" disabled onclick="startSession()">Start Workout →</button>
+    <hr class="jv-divider">
+    <div class="jv-label">Development Group</div>
+    <div class="jv-note">Same workout · Your own leaderboard · Earn your spot 🐏</div>
+    <div class="player-grid" id="jv-grid"></div>
+    <button class="btn-start" id="btn-start" disabled onclick="startSession()">Select Player to Begin</button>
   </div>
 </div>
 
@@ -138,6 +147,9 @@ body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
   <div class="screen active" id="screen-tracker">
     <div style="padding-top:14px">
       <button class="switch-btn" onclick="switchPlayer()">← Switch Player</button>
+      <div id="jv-banner" style="display:none;background:rgba(196,151,58,.1);border:1px solid rgba(196,151,58,.3);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--gold);line-height:1.6;">
+        <strong style="color:var(--gold-l)">Development Group</strong> — Same workout as varsity. Use this summer to earn your spot on the roster. 🐏
+      </div>
       <div class="date-row">
         <label>Date</label>
         <input type="date" id="date-input">
@@ -188,25 +200,31 @@ body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 <div class="toast" id="toast"></div>
 
 <script>
-// ============================================================
-// CONFIG — Update SCRIPT_URL with your Apps Script web app URL
-// ============================================================
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-xO2z6PWFi2MzWRqXTc8pxqu9W1_tQFfbNFx-KDgn64aIkXfyA5UlKfCMF7XlqIfj/exec';
 
-const PLAYERS = [
-  { name: 'Moana',     group: 'Guard' },
-  { name: 'Jazae',     group: 'Guard' },
-  { name: 'Josephine', group: 'Guard' },
-  { name: 'Malia',     group: 'Guard' },
-  { name: 'Alise',     group: 'Guard' },
-  { name: 'Khloe',     group: 'Guard' },
-  { name: 'Naomi',     group: 'Guard' },
-  { name: 'Daney',     group: 'Guard' },
-  { name: 'Kai',       group: 'Guard' },
-  { name: 'Serena',    group: 'Big'   },
-  { name: 'Aly',       group: 'Big'   },
-  { name: 'Anela',     group: 'Big'   },
+const VARSITY_PLAYERS = [
+  { name:'Moana',     group:'Guard', pos:'PG' },
+  { name:'Jazae',     group:'Guard', pos:'SG' },
+  { name:'Josephine', group:'Guard', pos:'SG' },
+  { name:'Malia',     group:'Guard', pos:'G'  },
+  { name:'Alise',     group:'Guard', pos:'W'  },
+  { name:'Khloe',     group:'Guard', pos:'W'  },
+  { name:'Naomi',     group:'Guard', pos:'W'  },
+  { name:'Daney',     group:'Guard', pos:'W'  },
+  { name:'Kai',       group:'Guard', pos:'W'  },
+  { name:'Anela',     group:'Big',   pos:'PF' },
+  { name:'Serena',    group:'Big',   pos:'C'  },
+  { name:'Aly',       group:'Big',   pos:'PF' },
 ];
+
+const JV_PLAYERS = [
+  { name:'Kyelle',   group:'Guard', pos:'G' },
+  { name:'Ixtli',    group:'Guard', pos:'G' },
+  { name:'Khate',    group:'Guard', pos:'G' },
+  { name:'McKenzie', group:'Guard', pos:'W' },
+];
+
+const ALL_PLAYERS = [...VARSITY_PLAYERS, ...JV_PLAYERS];
 
 const GUARD_SHOTS = [
   'Attack Move Layups off Two',
@@ -235,9 +253,9 @@ const BIG_SHOTS = [
 ];
 
 let currentPlayer = null;
+let isJV = false;
 let makes = Array(10).fill(0);
 
-// ---- API CALLS ----
 async function apiCall(params) {
   try {
     const url = SCRIPT_URL + '?' + new URLSearchParams(params).toString();
@@ -245,41 +263,39 @@ async function apiCall(params) {
     const text = await res.text();
     return JSON.parse(text);
   } catch(e) {
-    console.error('API error:', e);
     return { success: false, error: e.toString() };
   }
 }
 
-// ---- LOGIN ----
 function buildLogin() {
-  const guards = PLAYERS.filter(p => p.group === 'Guard');
-  const bigs   = PLAYERS.filter(p => p.group === 'Big');
-  document.getElementById('guard-grid').innerHTML = guards.map(p =>
-    `<div class="player-btn" onclick="selectPlayer('${p.name}','${p.group}',this)">
+  const guards   = VARSITY_PLAYERS.filter(p => p.group === 'Guard');
+  const bigs     = VARSITY_PLAYERS.filter(p => p.group === 'Big');
+  const makeBtn  = (p, jv) =>
+    `<div class="player-btn" onclick="selectPlayer('${p.name}','${p.group}',${jv},this)">
       <div class="pb-name">${p.name}</div>
-      <div class="pb-pos">${p.group}</div>
-    </div>`
-  ).join('');
-  document.getElementById('big-grid').innerHTML = bigs.map(p =>
-    `<div class="player-btn" onclick="selectPlayer('${p.name}','${p.group}',this)">
-      <div class="pb-name">${p.name}</div>
-      <div class="pb-pos">${p.group}</div>
-    </div>`
-  ).join('');
+      <div class="pb-pos">${p.pos} · ${p.group}</div>
+    </div>`;
+  document.getElementById('guard-grid').innerHTML  = guards.map(p => makeBtn(p, false)).join('');
+  document.getElementById('big-grid').innerHTML    = bigs.map(p => makeBtn(p, false)).join('');
+  document.getElementById('jv-grid').innerHTML     = JV_PLAYERS.map(p => makeBtn(p, true)).join('');
 }
 
-function selectPlayer(name, group, el) {
+function selectPlayer(name, group, jv, el) {
   currentPlayer = { name, group };
+  isJV = jv;
   document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
   el.classList.add('selected');
-  document.getElementById('btn-start').disabled = false;
+  const btn = document.getElementById('btn-start');
+  btn.disabled = false;
+  btn.textContent = `Start as ${name} →`;
 }
 
 function startSession() {
   if (!currentPlayer) return;
   document.getElementById('screen-login').style.display = 'none';
   document.getElementById('app-shell').style.display = 'block';
-  document.getElementById('hdr-sub').textContent = currentPlayer.name + ' · ' + currentPlayer.group + ' Workout';
+  document.getElementById('hdr-sub').textContent = currentPlayer.name + ' · ' + (isJV ? 'Dev Group' : 'Varsity');
+  document.getElementById('jv-banner').style.display = isJV ? 'block' : 'none';
   const today = new Date().toISOString().slice(0,10);
   document.getElementById('date-input').value = today;
   makes = Array(10).fill(0);
@@ -289,16 +305,18 @@ function startSession() {
 
 function switchPlayer() {
   currentPlayer = null;
+  isJV = false;
   makes = Array(10).fill(0);
   document.getElementById('app-shell').style.display = 'none';
   document.getElementById('screen-login').style.display = 'block';
   document.getElementById('screen-login').classList.add('active');
   document.getElementById('hdr-sub').textContent = 'Murrieta Mesa · 2026–27';
   document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById('btn-start').disabled = true;
+  const btn = document.getElementById('btn-start');
+  btn.disabled = true;
+  btn.textContent = 'Select Player to Begin';
 }
 
-// ---- SHOTS ----
 function buildShots() {
   const shots = currentPlayer.group === 'Guard' ? GUARD_SHOTS : BIG_SHOTS;
   document.getElementById('shot-list').innerHTML = shots.map((shot, idx) => `
@@ -348,7 +366,6 @@ function updateTotals() {
   document.getElementById('prog-label').textContent = total + ' / 100';
 }
 
-// ---- SAVE ----
 async function saveSession() {
   const btn = document.getElementById('save-btn');
   btn.innerHTML = '<span class="spinner"></span>Saving...';
@@ -368,11 +385,9 @@ async function saveSession() {
     showToast('Saved! ' + result.grandTotal + ' total makes ✓');
   } else {
     showToast('Error saving — try again');
-    console.error(result.error);
   }
 }
 
-// ---- LOAD TODAY ----
 async function loadTodayData() {
   const date = document.getElementById('date-input').value;
   const result = await apiCall({ action: 'load', player: currentPlayer.name });
@@ -388,7 +403,7 @@ async function loadTodayData() {
 }
 
 function resetToday() {
-  if (!confirm('Reset today\'s session?')) return;
+  if (!confirm("Reset today's session?")) return;
   makes = Array(10).fill(0);
   for (let i = 0; i < 10; i++) updateRow(i);
   document.getElementById('bonus-input').value = 0;
@@ -396,7 +411,6 @@ function resetToday() {
   updateTotals();
 }
 
-// ---- HISTORY ----
 async function loadHistory() {
   document.getElementById('history-content').innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Loading...</div>';
   const result = await apiCall({ action: 'load', player: currentPlayer.name });
@@ -405,20 +419,13 @@ async function loadHistory() {
     return;
   }
   const shots = currentPlayer.group === 'Guard' ? GUARD_SHOTS : BIG_SHOTS;
-  const shortName = s => s.replace("Pick a Spot 3's (2)","Spot 3's 2")
-    .replace("Pick a Spot 3's","Spot 3's")
-    .replace("Transition 3's","Trans 3's")
-    .replace('3PT Around the Horn','3PT Horn')
-    .replace('Attack Move Layups off Two','Layups')
-    .replace('Short Corner Pull-Up','Short Cnr')
-    .replace('Right Elbow Pull-Up','R Elbow')
-    .replace('Left Elbow Pull-Up','L Elbow')
-    .replace('Block Move Layups','Blk Layup')
-    .replace('Block Hook Shots','Blk Hook')
-    .replace('Right Short Corner Face-Up','R Shrt Cnr')
-    .replace('Left Short Corner Face-Up','L Shrt Cnr')
-    .replace('Right Elbow Face-Up','R Elbow')
-    .replace('Left Elbow Face-Up','L Elbow')
+  const sn = s => s.replace("Pick a Spot 3's (2)","Spot 3's 2").replace("Pick a Spot 3's","Spot 3's")
+    .replace("Transition 3's","Trans 3's").replace('3PT Around the Horn','3PT Horn')
+    .replace('Attack Move Layups off Two','Layups').replace('Short Corner Pull-Up','Short Cnr')
+    .replace('Right Elbow Pull-Up','R Elbow').replace('Left Elbow Pull-Up','L Elbow')
+    .replace('Block Move Layups','Blk Layup').replace('Block Hook Shots','Blk Hook')
+    .replace('Right Short Corner Face-Up','R Shrt Cnr').replace('Left Short Corner Face-Up','L Shrt Cnr')
+    .replace('Right Elbow Face-Up','R Elbow').replace('Left Elbow Face-Up','L Elbow')
     .replace('Free Throws','FT');
   document.getElementById('history-content').innerHTML =
     `<div class="section-title">${currentPlayer.name}'s Sessions</div>` +
@@ -438,17 +445,14 @@ async function loadHistory() {
         <div class="hist-shots">
           ${shots.map((s,i) => `
             <div class="hs-cell">
-              <div class="hs-n">${shortName(s)}</div>
+              <div class="hs-n">${sn(s)}</div>
               <div class="hs-v">${(row.makes && row.makes[i]) || 0}</div>
-            </div>
-          `).join('')}
+            </div>`).join('')}
         </div>
         ${row.notes ? `<div class="hist-note">${row.notes}</div>` : ''}
-      </div>
-    `).join('');
+      </div>`).join('');
 }
 
-// ---- LEADERBOARD ----
 async function loadLeaderboard() {
   document.getElementById('lb-content').innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Loading...</div>';
   const result = await apiCall({ action: 'leaderboard' });
@@ -457,27 +461,44 @@ async function loadLeaderboard() {
     return;
   }
   const rows = result.rows.sort((a,b) => b.totalMakes - a.totalMakes);
-  document.getElementById('lb-content').innerHTML = `
-    <div class="section-title">Total Makes — Summer 2026</div>
-    <div class="lb-card">
-      ${rows.map((row, i) => `
-        <div class="lb-row ${row.player === currentPlayer?.name ? 'me' : ''}">
-          <div class="lb-rank ${i < 3 ? 'top' : ''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
-          <div class="lb-info">
-            <div class="lb-name">${row.player}${row.player === currentPlayer?.name ? ' 👈' : ''}</div>
-            <div class="lb-group">${row.group} · ${row.sessions} sessions</div>
-          </div>
-          <div style="text-align:right">
-            <div class="lb-makes">${row.totalMakes}</div>
-            <div class="lb-makes-label">makes</div>
-          </div>
+  const varsityNames = new Set(VARSITY_PLAYERS.map(p => p.name));
+  const varsityRows = rows.filter(r => varsityNames.has(r.player));
+  const jvRows      = rows.filter(r => !varsityNames.has(r.player));
+  let html = `<div class="section-title">Total Makes — Summer 2026</div><div class="lb-card">`;
+  html += `<div class="lb-section-hdr">🏀 Varsity</div>`;
+  varsityRows.forEach((row, i) => {
+    html += `<div class="lb-row ${row.player === currentPlayer?.name ? 'me' : ''}">
+      <div class="lb-rank ${i < 3 ? 'top' : ''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+      <div class="lb-info">
+        <div class="lb-name">${row.player}${row.player === currentPlayer?.name ? ' 👈' : ''}</div>
+        <div class="lb-group">${row.group} · ${row.sessions} sessions</div>
+      </div>
+      <div style="text-align:right">
+        <div class="lb-makes">${row.totalMakes}</div>
+        <div class="lb-makes-label">makes</div>
+      </div>
+    </div>`;
+  });
+  if (jvRows.length > 0) {
+    html += `<div class="lb-section-hdr">⭐ Development Group</div>`;
+    jvRows.forEach((row, i) => {
+      html += `<div class="lb-row jv-row ${row.player === currentPlayer?.name ? 'me' : ''}">
+        <div class="lb-rank">${i+1}</div>
+        <div class="lb-info">
+          <div class="lb-name">${row.player}${row.player === currentPlayer?.name ? ' 👈' : ''}</div>
+          <div class="lb-group">${row.group} · ${row.sessions} sessions</div>
         </div>
-      `).join('')}
-    </div>
-  `;
+        <div style="text-align:right">
+          <div class="lb-makes">${row.totalMakes}</div>
+          <div class="lb-makes-label">makes</div>
+        </div>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+  document.getElementById('lb-content').innerHTML = html;
 }
 
-// ---- UI HELPERS ----
 function showTab(tab, btn) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
