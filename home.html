@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rams Training">
+<title>Murrieta Mesa Rams — Training Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#1a5c2a;--gmid:#2d8a42;--gbright:#4caf68;--gdark:#0a110a;
+  --gold:#c4973a;--gold-l:#e8b84b;--gold-d:#8a6820;
+  --blue:#1a5c8a;--purple:#5c1a8a;
+  --text:#d4e8d4;--dim:#6b8a6b;--bright:#f0f8f0;
+  --card:#1a261a;--border:#2a3d2a;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  background:var(--gdark);
+  font-family:'Barlow',sans-serif;
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* HEADER */
+.hdr{
+  background:linear-gradient(160deg,#0a1f0a,#1a5c2a);
+  padding:32px 20px 24px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  border-bottom:1px solid var(--border);
+}
+.hdr::before{
+  content:'RAMS';
+  position:absolute;
+  font-family:'Bebas Neue';
+  font-size:140px;
+  color:rgba(255,255,255,.03);
+  letter-spacing:8px;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  white-space:nowrap;
+}
+.logo{
+  width:72px;height:72px;
+  background:var(--gold);
+  border-radius:50%;
+  margin:0 auto 14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;
+  box-shadow:0 4px 20px rgba(196,151,58,.3);
+}
+.hdr h1{
+  font-family:'Bebas Neue';
+  font-size:30px;
+  color:var(--gold-l);
+  letter-spacing:3px;
+  line-height:1;
+  margin-bottom:4px;
+}
+.hdr h2{
+  font-family:'Bebas Neue';
+  font-size:18px;
+  color:rgba(255,255,255,.5);
+  letter-spacing:4px;
+  font-weight:400;
+  margin-bottom:10px;
+}
+.hdr-sub{
+  font-family:'Barlow Condensed';
+  font-size:11px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.35);
+}
+
+/* SEASON GOAL BAR */
+.goal-bar{
+  background:rgba(196,151,58,.12);
+  border-bottom:1px solid rgba(196,151,58,.2);
+  padding:10px 20px;
+  text-align:center;
+  font-family:'Barlow Condensed';
+  font-size:12px;
+  letter-spacing:1px;
+  color:var(--gold-l);
+}
+.goal-bar span{color:rgba(255,255,255,.5);}
+
+/* MAIN CONTENT */
+.main{flex:1;padding:20px 16px 40px;}
+
+/* SECTION LABEL */
+.section-label{
+  font-family:'Barlow Condensed';
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:12px;
+  padding-left:2px;
+}
+
+/* APP CARDS */
+.app-cards{display:flex;flex-direction:column;gap:14px;margin-bottom:28px;}
+
+.app-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  text-decoration:none;
+  display:block;
+  transition:transform .15s,box-shadow .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.app-card:active{transform:scale(.98);}
+
+.app-card-inner{display:flex;align-items:center;padding:18px 16px;gap:16px;}
+
+.app-icon{
+  width:58px;height:58px;
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;
+  flex-shrink:0;
+}
+.icon-shot{background:linear-gradient(135deg,var(--green),var(--gmid));}
+.icon-strength{background:linear-gradient(135deg,#8a3a0a,#c4621a);}
+.icon-cardio{background:linear-gradient(135deg,var(--blue),#1a8a8a);}
+
+.app-info{flex:1;min-width:0;}
+.app-name{
+  font-family:'Bebas Neue';
+  font-size:22px;
+  letter-spacing:1px;
+  line-height:1;
+  margin-bottom:3px;
+}
+.app-name-shot{color:var(--gold-l);}
+.app-name-strength{color:#f0a060;}
+.app-name-cardio{color:#60c0e0;}
+
+.app-desc{font-size:12px;color:var(--dim);line-height:1.5;margin-bottom:6px;}
+.app-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.app-tag{
+  font-family:'Barlow Condensed';
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  padding:2px 7px;
+  border-radius:3px;
+}
+.tag-green{background:rgba(76,175,104,.15);color:var(--gbright);}
+.tag-orange{background:rgba(196,98,26,.15);color:#e8a87c;}
+.tag-blue{background:rgba(26,92,138,.2);color:#5aabdd;}
+.tag-gold{background:rgba(196,151,58,.15);color:var(--gold-l);}
+
+.app-arrow{
+  font-size:20px;
+  color:var(--dim);
+  flex-shrink:0;
+}
+
+/* CHALLENGE CARD */
+.challenge-card{
+  background:linear-gradient(135deg,rgba(196,151,58,.15),rgba(26,92,42,.2));
+  border:1px solid rgba(196,151,58,.25);
+  border-radius:14px;
+  padding:18px 16px;
+  margin-bottom:28px;
+}
+.challenge-title{
+  font-family:'Bebas Neue';
+  font-size:18px;
+  color:var(--gold-l);
+  letter-spacing:2px;
+  margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.challenge-items{display:flex;flex-direction:column;gap:8px;}
+.challenge-item{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--dim);line-height:1.5;}
+.challenge-item .ci-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.challenge-item strong{color:var(--text);}
+
+/* REWARDS CARD */
+.rewards-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  margin-bottom:28px;
+}
+.rewards-hdr{
+  background:var(--green);
+  padding:12px 16px;
+  font-family:'Bebas Neue';
+  font-size:16px;
+  color:var(--gold-l);
+  letter-spacing:2px;
+}
+.reward-row{
+  display:flex;
+  align-items:center;
+  padding:14px 16px;
+  border-bottom:1px solid var(--border);
+  gap:12px;
+}
+.reward-row:last-child{border-bottom:none;}
+.reward-icon{font-size:28px;flex-shrink:0;}
+.reward-info{}
+.reward-name{font-size:13px;font-weight:600;color:var(--bright);margin-bottom:2px;}
+.reward-desc{font-size:11px;color:var(--dim);line-height:1.5;}
+
+/* FOOTER */
+.footer{
+  text-align:center;
+  padding:16px 20px 24px;
+  border-top:1px solid var(--border);
+}
+.footer p{font-size:11px;color:var(--dim);line-height:1.8;}
+.footer strong{color:var(--gold);}
+
+/* INSTALL PROMPT */
+.install-prompt{
+  background:rgba(26,92,42,.2);
+  border:1px solid rgba(76,175,104,.2);
+  border-radius:10px;
+  padding:12px 16px;
+  margin-bottom:20px;
+  font-size:12px;
+  color:var(--dim);
+  line-height:1.7;
+  text-align:center;
+}
+.install-prompt strong{color:var(--gbright);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="logo">🐏</div>
+  <h1>MURRIETA MESA RAMS</h1>
+  <h2>TRAINING HUB</h2>
+  <div class="hdr-sub">Varsity Girls Basketball · 2026–27</div>
+</div>
+
+<!-- GOAL BAR -->
+<div class="goal-bar">
+  🎯 SEASON GOAL: <strong>CIF D3 CHAMPIONSHIP</strong> &nbsp;·&nbsp; <span>Summer work wins February games</span>
+</div>
+
+<div class="main">
+
+  <!-- INSTALL PROMPT -->
+  <div class="install-prompt">
+    <strong>📲 Add to Home Screen</strong><br>
+    iPhone: tap Share → "Add to Home Screen"<br>
+    Android: tap ⋮ → "Add to Home Screen"<br>
+    One tap access every day.
+  </div>
+
+  <!-- APP CARDS -->
+  <div class="section-label">Your Training Apps</div>
+  <div class="app-cards">
+
+    <a class="app-card" href="./index.html">
+      <div class="app-card-inner">
+        <div class="app-icon icon-shot">🏀</div>
+        <div class="app-info">
+          <div class="app-name app-name-shot">100 Shot Tracker</div>
+          <div class="app-desc">Daily 100 makes workout. Log every shot, track your progress, compete on the leaderboard.</div>
+          <div class="app-tags">
+            <span class="app-tag tag-green">Daily</span>
+            <span class="app-tag tag-gold">10K Challenge</span>
+            <span class="app-tag tag-green">Leaderboard</span>
+          </div>
+        </div>
+        <div class="app-arrow">›</div>
+      </div>
+    </a>
+
+    <a class="app-card" href="./strength.html">
+      <div class="app-card-inner">
+        <div class="app-icon icon-strength">💪</div>
+        <div class="app-info">
+          <div class="app-name app-name-strength">Strength Trainer</div>
+          <div class="app-desc">Personalized weights based on your maxes. Lower, upper, and full body days with plyometric finishers.</div>
+          <div class="app-tags">
+            <span class="app-tag tag-orange">3x / Week</span>
+            <span class="app-tag tag-orange">Auto Weights</span>
+            <span class="app-tag tag-orange">Plyos</span>
+          </div>
+        </div>
+        <div class="app-arrow">›</div>
+      </div>
+    </a>
+
+    <a class="app-card" href="./cardio.html">
+      <div class="app-card-inner">
+        <div class="app-icon icon-cardio">⚡</div>
+        <div class="app-info">
+          <div class="app-name app-name-cardio">Cardio Trainer</div>
+          <div class="app-desc">Basketball-specific conditioning. Sprints, agility, change of direction, and defensive footwork.</div>
+          <div class="app-tags">
+            <span class="app-tag tag-blue">2x / Week</span>
+            <span class="app-tag tag-blue">30 Min</span>
+            <span class="app-tag tag-blue">COD + Agility</span>
+          </div>
+        </div>
+        <div class="app-arrow">›</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- SUMMER CHALLENGE -->
+  <div class="section-label">Summer Standards</div>
+  <div class="challenge-card">
+    <div class="challenge-title">🏆 The Standard</div>
+    <div class="challenge-items">
+      <div class="challenge-item">
+        <span class="ci-icon">🏀</span>
+        <span><strong>100 made shots</strong> every day outside of practice. Log it in the tracker — same day, no exceptions.</span>
+      </div>
+      <div class="challenge-item">
+        <span class="ci-icon">💪</span>
+        <span><strong>Strength training</strong> 3x per week. Log your sessions and track your compliance.</span>
+      </div>
+      <div class="challenge-item">
+        <span class="ci-icon">⚡</span>
+        <span><strong>Cardio workouts</strong> 2x per week. Sessions are coached for the first 2 weeks, then on your own.</span>
+      </div>
+      <div class="challenge-item">
+        <span class="ci-icon">🏃</span>
+        <span><strong>Team accountability:</strong> Every missed shooting day = sprints at the start of practice. We run together.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- REWARDS -->
+  <div class="section-label">What You're Playing For</div>
+  <div class="rewards-card">
+    <div class="rewards-hdr">🏆 End of Summer Rewards</div>
+    <div class="reward-row">
+      <div class="reward-icon">🥇</div>
+      <div class="reward-info">
+        <div class="reward-name">The Golden Ball</div>
+        <div class="reward-desc">Highest total made shots — engraved, displayed in our gym permanently. First name on it owns it forever.</div>
+      </div>
+    </div>
+    <div class="reward-row">
+      <div class="reward-icon">👕</div>
+      <div class="reward-info">
+        <div class="reward-name">Custom 10K Shooter Shirt</div>
+        <div class="reward-desc">Reach 10,000 made shots and earn the exclusive Rams 10K shirt. You cannot buy this — only earn it.</div>
+      </div>
+    </div>
+    <div class="reward-row">
+      <div class="reward-icon">📱</div>
+      <div class="reward-info">
+        <div class="reward-name">Social Media Shoutout</div>
+        <div class="reward-desc">Every 10K Club member gets featured on the Rams social. Your work gets recognized.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>
+    <strong>Murrieta Mesa Rams</strong><br>
+    Varsity Girls Basketball · 2026–27<br>
+    <span style="font-size:10px;opacity:.5">mesagirlshoops@gmail.com</span>
+  </p>
+</div>
+
+</body>
+</html>
