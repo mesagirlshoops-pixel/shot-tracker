@@ -89,6 +89,7 @@ body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);min-
 .set-btn.done{background:var(--green);border-color:var(--gbright);color:white;}
 .ex-note{font-size:10px;color:var(--dim);font-style:italic;margin-top:6px;padding-top:6px;border-top:1px solid var(--border2);}
 .ex-flag{font-size:10px;color:#e8a87c;margin-top:4px;padding:4px 8px;background:rgba(196,98,26,.1);border-radius:4px;}
+.watch-btn{display:inline-flex;align-items:center;gap:4px;background:rgba(26,92,138,.2);border:1px solid rgba(26,92,138,.4);color:#5aabdd;font-size:10px;font-weight:600;font-family:'Barlow Condensed';letter-spacing:1px;padding:4px 10px;border-radius:4px;cursor:pointer;margin-top:6px;text-decoration:none;}
 .prehab-section{background:rgba(26,92,42,.15);border:1px solid rgba(76,175,104,.2);border-radius:10px;overflow:hidden;margin-bottom:14px;}
 .prehab-hdr{background:rgba(76,175,104,.2);padding:8px 14px;font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:2px;color:var(--gbright);text-transform:uppercase;}
 .prehab-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border2);}
@@ -201,7 +202,7 @@ const VP=[
   {name:'Naomi',    group:'Guard',pos:'W', flag:'acl',     fn:'ACL protocol — phase-based return to training.'},
   {name:'Daney',    group:'Guard',pos:'W', flag:'acl',     fn:'ACL protocol — phase-based return to training.'},
   {name:'Kai',      group:'Guard',pos:'W', flag:'locked',  fn:'Complete doctor rehab first. Notify Coach Rudy when cleared.'},
-  {name:'Anela',    group:'Big',pos:'PF', flag:'ankle_mod',fn:'High ankle sprain — modified sessions. Daily swelling check-in required.'},
+  {name:'Anela',    group:'Guard',pos:'W', flag:'ankle_mod',fn:'High ankle sprain — modified sessions. Daily swelling check-in required.'},
   {name:'Serena',   group:'Big',  pos:'C', flag:'knee',    fn:'Moderate knee pain — reduce load if needed.'},
   {name:'Aly',      group:'Big',  pos:'PF',flag:'hand',    fn:'Right hand ligament — grip exercises flagged. Modify if bothering you today.'},
 ];
@@ -347,6 +348,66 @@ let cp=null,isJV=false,pm={},cd=null,sd={},preh={},ply={},adj={},aclP=1,ankR=0;
 function gw(){return Math.min(11,Math.max(1,Math.floor((new Date()-BLOCK_START)/(7*24*60*60*1000))+1));}
 function gb(){return WB[Math.min(gw()-1,10)];}
 function cw(key,pct){const m=pm[key]||0;if(!m||!pct)return null;return Math.round(m*pct/5)*5;}
+const YT={
+  'Back Squat':'https://www.youtube.com/results?search_query=back+squat+proper+form+basketball',
+  'Trap Bar Deadlift':'https://www.youtube.com/results?search_query=trap+bar+deadlift+form',
+  'Bulgarian Split Squat':'https://www.youtube.com/results?search_query=bulgarian+split+squat+form',
+  'Single-Leg Romanian Deadlift':'https://www.youtube.com/results?search_query=single+leg+romanian+deadlift+form',
+  'Step-Up with Knee Drive':'https://www.youtube.com/results?search_query=step+up+knee+drive+exercise',
+  'Hip Thrust (Barbell)':'https://www.youtube.com/results?search_query=barbell+hip+thrust+form',
+  'Nordic Hamstring Curl':'https://www.youtube.com/results?search_query=nordic+hamstring+curl+form+ACL',
+  'Single-Leg Calf Raise':'https://www.youtube.com/results?search_query=single+leg+calf+raise',
+  'Dead Bug':'https://www.youtube.com/results?search_query=dead+bug+exercise+core',
+  'Copenhagen Plank':'https://www.youtube.com/results?search_query=copenhagen+plank+form',
+  'Pallof Press':'https://www.youtube.com/results?search_query=pallof+press+core+exercise',
+  'Bench Press':'https://www.youtube.com/results?search_query=bench+press+proper+form',
+  'Barbell Row':'https://www.youtube.com/results?search_query=barbell+row+proper+form',
+  'Overhead Press':'https://www.youtube.com/results?search_query=overhead+press+proper+form',
+  'Pull-Ups / Lat Pulldown':'https://www.youtube.com/results?search_query=pull+ups+lat+pulldown+form',
+  'Single-Arm DB Press':'https://www.youtube.com/results?search_query=single+arm+dumbbell+press',
+  'Single-Arm DB Row':'https://www.youtube.com/results?search_query=single+arm+dumbbell+row+form',
+  'Face Pulls':'https://www.youtube.com/results?search_query=face+pulls+rotator+cuff',
+  'Farmer Carry':'https://www.youtube.com/results?search_query=farmer+carry+exercise+form',
+  'Plate Pinch':'https://www.youtube.com/results?search_query=plate+pinch+grip+strength',
+  'Russian Twists':'https://www.youtube.com/results?search_query=russian+twists+core',
+  'Plank to Push-Up':'https://www.youtube.com/results?search_query=plank+to+push+up+exercise',
+  'Hanging Leg Raises':'https://www.youtube.com/results?search_query=hanging+leg+raises+form',
+  'Hang Power Clean':'https://www.youtube.com/results?search_query=hang+power+clean+form+beginners',
+  'Kettlebell Swing':'https://www.youtube.com/results?search_query=kettlebell+swing+form+hip+hinge',
+  'Front Squat':'https://www.youtube.com/results?search_query=front+squat+form',
+  'Romanian Deadlift':'https://www.youtube.com/results?search_query=romanian+deadlift+form',
+  'Med Ball Rotational Throw':'https://www.youtube.com/results?search_query=medicine+ball+rotational+throw',
+  'Cable/Band Chop High-Low':'https://www.youtube.com/results?search_query=cable+chop+high+low+core',
+  'Med Ball Slam':'https://www.youtube.com/results?search_query=medicine+ball+slam+exercise',
+  'Pull-Ups / Inverted Rows':'https://www.youtube.com/results?search_query=inverted+rows+form',
+  'Trap Bar Farmer Carry':'https://www.youtube.com/results?search_query=trap+bar+farmer+carry',
+  'Goblet Squat':'https://www.youtube.com/results?search_query=goblet+squat+form',
+  'Leg Press (Bilateral)':'https://www.youtube.com/results?search_query=leg+press+form+proper',
+  'Glute Bridge':'https://www.youtube.com/results?search_query=glute+bridge+form',
+  'Box Step-Down':'https://www.youtube.com/results?search_query=box+step+down+ACL+rehab',
+  'Single-Leg RDL':'https://www.youtube.com/results?search_query=single+leg+rdl+form',
+  'Hip Thrust':'https://www.youtube.com/results?search_query=hip+thrust+form',
+  'Single-Leg Hop + Stick':'https://www.youtube.com/results?search_query=single+leg+hop+and+stick+landing',
+  'Banded Hip Activation':'https://www.youtube.com/results?search_query=banded+hip+activation+clamshell',
+  'Single-Leg Balance Hold':'https://www.youtube.com/results?search_query=single+leg+balance+proprioception',
+  'Seated Leg Extension (Light)':'https://www.youtube.com/results?search_query=leg+extension+machine+form',
+  'Box Jumps':'https://www.youtube.com/results?search_query=box+jump+proper+form+landing',
+  'Broad Jumps':'https://www.youtube.com/results?search_query=broad+jump+form+athletics',
+  'Trap Bar Jump Squat':'https://www.youtube.com/results?search_query=trap+bar+jump+squat',
+  'Lateral Bounds':'https://www.youtube.com/results?search_query=lateral+bounds+exercise+athletics',
+  'Depth Drop (land only)':'https://www.youtube.com/results?search_query=depth+drop+landing+mechanics+ACL',
+  'Depth Jump':'https://www.youtube.com/results?search_query=depth+jump+plyometric+form',
+  'Ab Wheel Rollout':'https://www.youtube.com/results?search_query=ab+wheel+rollout+form',
+  'Bent-Knee Wall Sit':'https://www.youtube.com/results?search_query=wall+sit+exercise+form',
+  'Lateral Slide Hold':'https://www.youtube.com/results?search_query=defensive+slide+basketball+stance',
+  'Defensive Stance Shuffle':'https://www.youtube.com/results?search_query=defensive+slide+basketball+drill',
+  'Banded Ankle Eversion':'https://www.youtube.com/results?search_query=banded+ankle+eversion+exercise',
+  'Single-Leg Balance':'https://www.youtube.com/results?search_query=single+leg+balance+ankle+stability',
+  'Calf Raise + Slow Lower':'https://www.youtube.com/results?search_query=calf+raise+eccentric+form',
+  'Lateral Ankle Hop':'https://www.youtube.com/results?search_query=lateral+ankle+hops+stability',
+};
+function getYT(name){return YT[name]||`https://www.youtube.com/results?search_query=${encodeURIComponent(name+' exercise form')}`;}
+
 function buildLogin(){
   document.getElementById('varsity-grid').innerHTML=VP.map(p=>`<div class="player-btn" onclick="selP('${p.name}',false,this)"><div class="pb-name">${p.name}</div><div class="pb-pos">${p.pos}${p.flag?' · ⚠️':''}</div></div>`).join('');
   document.getElementById('jv-grid').innerHTML=JP.map(p=>`<div class="player-btn" onclick="selP('${p.name}',true,this)"><div class="pb-name">${p.name}</div><div class="pb-pos">${p.pos} · Dev</div></div>`).join('');
@@ -407,6 +468,7 @@ function buildWx(){
       if(ex.note)html+=`<div class="ex-note">💡 ${ex.note}</div>`;
       if(mn)html+=`<div class="ex-flag">${mn}</div>`;
       if(ex.gripFlag&&f==='hand')html+=`<div class="ex-flag">✋ HAND FLAG — Modify grip load if right hand is bothering you today.</div>`;
+      html+=`<a class="watch-btn" href="${getYT(ex.name)}" target="_blank">▶ Watch Demo</a>`;
       html+=`</div>`;
     });
     html+=`</div>`;
@@ -415,9 +477,9 @@ function buildWx(){
   html+=`<button class="save-btn" onclick="saveWx()">Save Session ✓</button><button class="secondary-btn" onclick="rstWx()">Reset</button>`;
   document.getElementById('workout-content').innerHTML=html;
 }
-function buildACLWx(ph){let html=`<div class="ex-section"><div class="ex-section-hdr"><span class="ex-section-title">Phase ${ph.phase} Exercises</span></div>`;ph.exercises.forEach((ex,i)=>{const id=`acl-${i}`,done=sd[id+'-all'];let wt=null;if(ex.key&&ex.type){const pct=ex.type==='upper'?.65:.5;wt=adj[id]||cw(ex.key,pct);}html+=`<div class="ex-card"><div class="ex-header"><div><div class="ex-name">${ex.name}</div><div class="ex-scheme">${ex.sets||3}×${ex.reps||'—'} · ${ex.rest?Math.floor(ex.rest/60)+' min':''}</div></div><button class="ex-done-btn ${done?'done':''}" onclick="togAll('${id}',${ex.sets||3})">${done?'✓':'○'}</button></div>`;if(wt)html+=`<div class="ex-weight-row"><span class="ex-weight-label">Target</span><span class="ex-weight-val" id="wt-${id}">${wt}</span><span class="ex-weight-unit">lbs</span><div class="adj-wrap"><div class="adj-btn" onclick="adjW('${id}','${ex.key}',.65,-5)">−</div><div class="adj-btn" onclick="adjW('${id}','${ex.key}',.65,5)">+</div></div></div>`;else if(ex.weight)html+=`<div class="ex-weight-row"><span class="ex-weight-label">Load</span><span style="font-size:13px;color:var(--gold)">${ex.weight}</span></div>`;html+=`<div class="set-row">${Array.from({length:ex.sets||3},(_,s)=>`<div class="set-btn ${sd[id+'-'+(s+1)]?'done':''}" onclick="togSet('${id}',${s+1})">S${s+1}</div>`).join('')}</div>`;if(ex.note)html+=`<div class="ex-note">💡 ${ex.note}</div>`;html+=`</div>`;});html+=`</div>`;return html;}
+function buildACLWx(ph){let html=`<div class="ex-section"><div class="ex-section-hdr"><span class="ex-section-title">Phase ${ph.phase} Exercises</span></div>`;ph.exercises.forEach((ex,i)=>{const id=`acl-${i}`,done=sd[id+'-all'];let wt=null;if(ex.key&&ex.type){const pct=ex.type==='upper'?.65:.5;wt=adj[id]||cw(ex.key,pct);}html+=`<div class="ex-card"><div class="ex-header"><div><div class="ex-name">${ex.name}</div><div class="ex-scheme">${ex.sets||3}×${ex.reps||'—'} · ${ex.rest?Math.floor(ex.rest/60)+' min':''}</div></div><button class="ex-done-btn ${done?'done':''}" onclick="togAll('${id}',${ex.sets||3})">${done?'✓':'○'}</button></div>`;if(wt)html+=`<div class="ex-weight-row"><span class="ex-weight-label">Target</span><span class="ex-weight-val" id="wt-${id}">${wt}</span><span class="ex-weight-unit">lbs</span><div class="adj-wrap"><div class="adj-btn" onclick="adjW('${id}','${ex.key}',.65,-5)">−</div><div class="adj-btn" onclick="adjW('${id}','${ex.key}',.65,5)">+</div></div></div>`;else if(ex.weight)html+=`<div class="ex-weight-row"><span class="ex-weight-label">Load</span><span style="font-size:13px;color:var(--gold)">${ex.weight}</span></div>`;html+=`<div class="set-row">${Array.from({length:ex.sets||3},(_,s)=>`<div class="set-btn ${sd[id+'-'+(s+1)]?'done':''}" onclick="togSet('${id}',${s+1})">S${s+1}</div>`).join('')}</div>`;if(ex.note)html+=`<div class="ex-note">💡 ${ex.note}</div>`;html+=`<a class="watch-btn" href="${getYT(ex.name)}" target="_blank">▶ Watch Demo</a>`;html+=`</div>`;});html+=`</div>`;return html;}
 function buildFin(flag){const w=gw(),fi=(w-1)%3,isACL=flag==='acl',half=isACL&&aclP===4,items=isACL&&aclP<4?ACL_FIN:FINS[fi].items,lbl=isACL&&aclP<4?'ACL Recovery Finisher':FINS[fi].label+(half?' (50% Vol)':'');const show=half?items.slice(0,3):items;let html=`<div class="finisher-card"><div class="finisher-hdr"><h3>⚡ ${lbl}</h3><span>Fin ${isACL?'ACL':FINS[fi].id}</span></div><div style="padding:0 0 8px">`;show.forEach((item,i)=>{html+=`<div class="plyo-item"><div class="plyo-check ${ply[i]?'done':''}" onclick="togPly(${i})">${ply[i]?'✓':''}</div><div><div class="plyo-name">${item.name}</div><div class="plyo-detail">${item.detail}</div><span class="plyo-tag tag-${item.tag}">${item.tag.toUpperCase()}</span></div></div>`;});html+=`</div></div>`;return html;}
-function bPre(title,items,key){let html=`<div class="prehab-section"><div class="prehab-hdr">${title}</div>`;items.forEach((item,i)=>{const k=`${key}-${i}`;html+=`<div class="prehab-item"><div class="prehab-check ${preh[k]?'done':''}" onclick="togPre('${k}')">${preh[k]?'✓':''}</div><div><div class="prehab-name">${item.name}</div><div class="prehab-detail">${item.detail}</div></div></div>`;});html+=`</div>`;return html;}
+function bPre(title,items,key){let html=`<div class="prehab-section"><div class="prehab-hdr">${title}</div>`;items.forEach((item,i)=>{const k=`${key}-${i}`;html+=`<div class="prehab-item"><div class="prehab-check ${preh[k]?'done':''}" onclick="togPre('${k}')">${preh[k]?'✓':''}</div><div><div class="prehab-name">${item.name}</div><div class="prehab-detail">${item.detail}</div><a class="watch-btn" href="${getYT(item.name)}" target="_blank">▶ Watch Demo</a></div></div>`;});html+=`</div>`;return html;}
 function togSet(id,s){const k=id+'-'+s;sd[k]=!sd[k];document.querySelector(`[onclick="togSet('${id}',${s})"]`)?.classList.toggle('done',sd[k]);}
 function togAll(id,n){const ak=id+'-all',ns=!sd[ak];sd[ak]=ns;for(let s=1;s<=n;s++)sd[id+'-'+s]=ns;buildWx();}
 function togPre(k){preh[k]=!preh[k];const el=document.querySelector(`[onclick="togPre('${k}')"]`);if(el){el.classList.toggle('done',preh[k]);el.textContent=preh[k]?'✓':''}}

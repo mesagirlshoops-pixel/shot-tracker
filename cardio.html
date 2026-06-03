@@ -67,6 +67,7 @@ body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);min-
 .drill-detail{font-size:11px;color:var(--dim);margin-top:2px;line-height:1.5;}
 .drill-technique{font-size:10px;color:#5aabdd;margin-top:4px;font-style:italic;}
 .drill-tag{display:inline-block;font-size:9px;padding:2px 6px;border-radius:3px;font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;margin-top:4px;}
+.watch-btn{display:inline-flex;align-items:center;gap:4px;background:rgba(26,92,138,.2);border:1px solid rgba(26,92,138,.4);color:#5aabdd;font-size:10px;font-weight:600;font-family:'Barlow Condensed';letter-spacing:1px;padding:4px 10px;border-radius:4px;cursor:pointer;margin-top:6px;text-decoration:none;}
 .tag-sprint{background:rgba(196,151,58,.15);color:var(--gold);}
 .tag-agility{background:rgba(26,92,138,.2);color:#5aabdd;}
 .tag-mobility{background:rgba(76,175,104,.15);color:var(--gbright);}
@@ -349,6 +350,47 @@ function isCoached() {
   return getCurrentWeek() <= 2;
 }
 
+const CARDIO_YT = {
+  'Dynamic Warm-Up':'https://www.youtube.com/results?search_query=dynamic+warm+up+basketball+athletes',
+  'Roll and Reach — Basketball':'https://www.youtube.com/results?search_query=roll+and+reach+hip+mobility+drill',
+  'Roll and Reach — Seated':'https://www.youtube.com/results?search_query=seated+hip+mobility+drill',
+  'Wind Sprints':'https://www.youtube.com/results?search_query=wind+sprints+proper+form+athletes',
+  'Direction Change Sprints (Run-Touch-Run)':'https://www.youtube.com/results?search_query=direction+change+sprint+drill+basketball',
+  'Box Agility Drill':'https://www.youtube.com/results?search_query=box+agility+drill+run+slide+backpedal+basketball',
+  '5-10-5 Pro Agility':'https://www.youtube.com/results?search_query=5+10+5+pro+agility+drill+form',
+  'Hip 90/90 Stretch with Ball':'https://www.youtube.com/results?search_query=90+90+hip+stretch+mobility',
+  'Lateral Hip Opener with Ball':'https://www.youtube.com/results?search_query=lateral+hip+opener+stretch+mobility',
+  'Two-Foot Line Hops (Lateral)':'https://www.youtube.com/results?search_query=lateral+line+hops+basketball+conditioning',
+  'Single-Leg Line Hops':'https://www.youtube.com/results?search_query=single+leg+line+hops+ankle+stability',
+  'Forward-Back Line Hops':'https://www.youtube.com/results?search_query=forward+back+line+hops+footwork',
+  'Defensive Slide → Sprint → Slide':'https://www.youtube.com/results?search_query=defensive+slide+sprint+basketball+drill',
+  'Closeout → Defensive Stance Drill':'https://www.youtube.com/results?search_query=basketball+closeout+defensive+stance+drill',
+  'Bent-Knee Wall Sit Hold':'https://www.youtube.com/results?search_query=wall+sit+defensive+stance+basketball',
+  'Court Suicide Sprints':'https://www.youtube.com/results?search_query=basketball+suicide+sprints+conditioning',
+  'Defensive Slide Full Court':'https://www.youtube.com/results?search_query=full+court+defensive+slide+basketball',
+  'Push-Up Intervals':'https://www.youtube.com/results?search_query=push+up+proper+form+athletes',
+  'Mountain Climbers':'https://www.youtube.com/results?search_query=mountain+climbers+proper+form+core',
+  'Plank Hold + Shoulder Taps':'https://www.youtube.com/results?search_query=plank+shoulder+taps+core+stability',
+  'Straight-Line Walks with Ball Reach':'https://www.youtube.com/results?search_query=walking+hip+mobility+drill+basketball',
+  'Heel-to-Toe Balance Walk':'https://www.youtube.com/results?search_query=heel+toe+balance+walk+ankle+stability',
+  'Banded Hip Activation':'https://www.youtube.com/results?search_query=banded+hip+activation+clamshell+lateral+walk',
+  'Single-Leg Balance Hold':'https://www.youtube.com/results?search_query=single+leg+balance+proprioception+ankle',
+  'Seated Ankle Circles':'https://www.youtube.com/results?search_query=ankle+circles+mobility+rehab',
+  'Resistance Band Ankle Flexion':'https://www.youtube.com/results?search_query=resistance+band+ankle+strengthening',
+  'Roll and Reach — Seated':'https://www.youtube.com/results?search_query=seated+hip+mobility+floor+stretch',
+  'Straight-Line Jog':'https://www.youtube.com/results?search_query=jogging+form+proper+technique',
+  'Direction Change Sprints — MODIFIED':'https://www.youtube.com/results?search_query=slow+direction+change+drill+rehab',
+  'Upper Body Cardio':'https://www.youtube.com/results?search_query=upper+body+cardio+no+legs',
+  'Post-Workout Ankle Assessment':'https://www.youtube.com/results?search_query=ankle+swelling+assessment+athletes',
+  'Wind Sprints — STRAIGHT LINE ONLY':'https://www.youtube.com/results?search_query=straight+line+sprint+form+proper',
+  'Cat-Cow Stretch':'https://www.youtube.com/results?search_query=cat+cow+stretch+back+mobility',
+  'Hip Flexor Stretch':'https://www.youtube.com/results?search_query=hip+flexor+stretch+lower+back',
+  'Defensive Slide — MODIFIED':'https://www.youtube.com/results?search_query=slow+defensive+slide+basketball+form',
+};
+function getCardioYT(name) {
+  return CARDIO_YT[name] || `https://www.youtube.com/results?search_query=${encodeURIComponent(name+' exercise drill form')}`;
+}
+
 function buildLogin() {
   document.getElementById('varsity-grid').innerHTML = VARSITY_PLAYERS.map(p =>
     `<div class="player-btn" onclick="selectPlayer('${p.name}',false,this)">
@@ -489,6 +531,7 @@ function buildSession() {
           <div class="drill-detail">${drill.detail}</div>
           ${coached && drill.technique ? `<div class="drill-technique">💡 ${drill.technique}</div>` : ''}
           <span class="drill-tag tag-${drill.tag}">${drill.tag.toUpperCase()}</span>
+          <a class="watch-btn" href="${getCardioYT(drill.name)}" target="_blank">▶ Watch Demo</a>
         </div>
       </div>`;
     });
