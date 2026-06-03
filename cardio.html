@@ -62,10 +62,10 @@ body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);min-
 .drill-item:last-child{border-bottom:none;}
 .drill-check{width:26px;height:26px;border-radius:5px;border:1px solid var(--border);background:var(--card2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px;}
 .drill-check.done{background:var(--blue);border-color:#5aabdd;}
-.drill-info{flex:1;}
+.drill-info{flex:1;min-width:0;}
 .drill-name{font-size:13px;font-weight:600;color:var(--bright);}
-.drill-detail{font-size:11px;color:var(--dim);margin-top:2px;line-height:1.5;}
-.drill-technique{font-size:10px;color:#5aabdd;margin-top:4px;font-style:italic;}
+.drill-detail{font-size:11px;color:var(--dim);margin-top:2px;line-height:1.5;word-break:break-word;}
+.drill-technique{font-size:10px;color:#5aabdd;margin-top:4px;font-style:italic;word-break:break-word;}
 .drill-tag{display:inline-block;font-size:9px;padding:2px 6px;border-radius:3px;font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;margin-top:4px;}
 .watch-btn{display:inline-flex;align-items:center;gap:4px;background:rgba(26,92,138,.2);border:1px solid rgba(26,92,138,.4);color:#5aabdd;font-size:10px;font-weight:600;font-family:'Barlow Condensed';letter-spacing:1px;padding:4px 10px;border-radius:4px;cursor:pointer;margin-top:6px;text-decoration:none;}
 .tag-sprint{background:rgba(196,151,58,.15);color:var(--gold);}
@@ -373,7 +373,13 @@ const CARDIO_YT = {
   'Plank Hold + Shoulder Taps':'https://www.youtube.com/results?search_query=plank+shoulder+taps+core+stability',
   'Straight-Line Walks with Ball Reach':'https://www.youtube.com/results?search_query=walking+hip+mobility+drill+basketball',
   'Heel-to-Toe Balance Walk':'https://www.youtube.com/results?search_query=heel+toe+balance+walk+ankle+stability',
-  'Banded Hip Activation':'https://www.youtube.com/results?search_query=banded+hip+activation+clamshell+lateral+walk',
+  'Banded Ankle Eversion':'https://www.youtube.com/results?search_query=banded+ankle+eversion+strengthening',
+  'Single-Leg Balance Hold':'https://www.youtube.com/results?search_query=single+leg+balance+ankle+stability+proprioception',
+  'Calf Raise + Slow Lower':'https://www.youtube.com/results?search_query=eccentric+calf+raise+ankle+strengthening',
+  'Lateral Ankle Hop':'https://www.youtube.com/results?search_query=lateral+ankle+hops+stability+drill',
+  'Bent-Knee Wall Sit':'https://www.youtube.com/results?search_query=wall+sit+defensive+stance+basketball',
+  'Lateral Slide Hold':'https://www.youtube.com/results?search_query=defensive+slide+hold+basketball+stance',
+  'Defensive Stance Shuffle':'https://www.youtube.com/results?search_query=defensive+shuffle+basketball+stance+drill',
   'Single-Leg Balance Hold':'https://www.youtube.com/results?search_query=single+leg+balance+proprioception+ankle',
   'Seated Ankle Circles':'https://www.youtube.com/results?search_query=ankle+circles+mobility+rehab',
   'Resistance Band Ankle Flexion':'https://www.youtube.com/results?search_query=resistance+band+ankle+strengthening',
@@ -488,6 +494,36 @@ function selectSession(type, el) {
   buildSession();
 }
 
+const CARDIO_ANKLE_PRE = [
+  {name:'Banded Ankle Eversion',   detail:'3×15 each foot — band resistance, pull outward. Strengthens ankle stabilizers.',    tag:'mobility'},
+  {name:'Single-Leg Balance Hold', detail:'3×30 sec each leg — eyes open, progress to eyes closed. Builds proprioception.',     tag:'mobility'},
+  {name:'Calf Raise + Slow Lower', detail:'3×12 — 3 seconds down. Builds ankle tendon strength and control.',                   tag:'mobility'},
+  {name:'Lateral Ankle Hop',       detail:'3×10 small hops side to side — stick each landing softly. Ankle stability.',        tag:'mobility'},
+];
+const CARDIO_POSTURE_PRE = [
+  {name:'Bent-Knee Wall Sit',      detail:'3×30 sec — 90° knee angle. Feel what correct defensive position feels like.',        tag:'defense'},
+  {name:'Lateral Slide Hold',      detail:'3×20 sec each side — stay LOW, weight on balls of feet throughout.',                 tag:'defense'},
+  {name:'Defensive Stance Shuffle',detail:'3×30 sec — shuffle L/R staying in athletic bent-knee stance the whole time.',       tag:'defense'},
+];
+
+function buildPrehab(title, items) {
+  let html = `<div style="background:rgba(26,92,42,.15);border:1px solid rgba(76,175,104,.2);border-radius:10px;overflow:hidden;margin-bottom:12px;">
+    <div style="background:rgba(76,175,104,.2);padding:8px 14px;font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:2px;color:var(--gbright);text-transform:uppercase;">${title}</div>`;
+  items.forEach((item, i) => {
+    html += `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border2);">
+      <div style="font-size:11px;color:var(--gbright);flex-shrink:0;margin-top:2px;">→</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;color:var(--bright);">${item.name}</div>
+        <div style="font-size:11px;color:var(--dim);margin-top:2px;line-height:1.5;">${item.detail}</div>
+        <span style="display:inline-block;font-size:9px;padding:2px 6px;border-radius:3px;font-family:'Barlow Condensed';font-weight:700;letter-spacing:1px;margin-top:4px;background:rgba(76,175,104,.15);color:var(--gbright);">${item.tag.toUpperCase()}</span>
+        <a class="watch-btn" href="${getCardioYT(item.name)}" target="_blank" style="display:inline-flex;margin-left:6px;">▶ Watch Demo</a>
+      </div>
+    </div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
 function getSessionData(type) {
   const flag = currentPlayer?.flag;
   if (flag === 'acl') return ACL_SESSION;
@@ -512,6 +548,11 @@ function buildSession() {
       <strong>Today's Focus:</strong> ${focus}
     </div>`;
   }
+
+  // Inject prehab blocks based on player flag
+  const flag = currentPlayer?.flag;
+  if (flag === 'ankle') html += buildPrehab('🦶 Ankle Prehab — Required Every Session', CARDIO_ANKLE_PRE);
+  if (flag === 'posture' || currentPlayer?.name === 'Aly' || currentPlayer?.name === 'Alise') html += buildPrehab('🏀 Defensive Posture — Required Every Session', CARDIO_POSTURE_PRE);
 
   data.blocks.forEach((block, bi) => {
     const totalDone = Object.keys(drillsDone).filter(k => k.startsWith(`${bi}-`) && drillsDone[k]).length;

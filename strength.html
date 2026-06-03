@@ -92,9 +92,9 @@ body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);min-
 .watch-btn{display:inline-flex;align-items:center;gap:4px;background:rgba(26,92,138,.2);border:1px solid rgba(26,92,138,.4);color:#5aabdd;font-size:10px;font-weight:600;font-family:'Barlow Condensed';letter-spacing:1px;padding:4px 10px;border-radius:4px;cursor:pointer;margin-top:6px;text-decoration:none;}
 .prehab-section{background:rgba(26,92,42,.15);border:1px solid rgba(76,175,104,.2);border-radius:10px;overflow:hidden;margin-bottom:14px;}
 .prehab-hdr{background:rgba(76,175,104,.2);padding:8px 14px;font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:2px;color:var(--gbright);text-transform:uppercase;}
-.prehab-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border2);}
+.prehab-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border2);}
 .prehab-item:last-child{border-bottom:none;}
-.prehab-check{width:24px;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.prehab-check{width:24px;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px;}
 .prehab-check.done{background:var(--gbright);border-color:var(--gbright);color:var(--gdark);}
 .prehab-name{font-size:12px;font-weight:600;color:var(--bright);}
 .prehab-detail{font-size:10px;color:var(--dim);margin-top:1px;}
@@ -191,7 +191,7 @@ body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);min-
 <div class="toast" id="toast"></div>
 <script>
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycby-xO2z6PWFi2MzWRqXTc8pxqu9W1_tQFfbNFx-KDgn64aIkXfyA5UlKfCMF7XlqIfj/exec';
-const BLOCK_START=new Date('2026-06-02');
+const BLOCK_START=new Date('2026-05-26');
 const VP=[
   {name:'Moana',    group:'Guard',pos:'PG',flag:'ankle',   fn:'Ankle prehab added every session. Report any swelling.'},
   {name:'Jazae',    group:'Guard',pos:'SG',flag:'back',    fn:'Back modification active — ramp-up protocol in place until fully cleared.'},
@@ -403,6 +403,9 @@ const YT={
   'Defensive Stance Shuffle':'https://www.youtube.com/results?search_query=defensive+slide+basketball+drill',
   'Banded Ankle Eversion':'https://www.youtube.com/results?search_query=banded+ankle+eversion+exercise',
   'Single-Leg Balance':'https://www.youtube.com/results?search_query=single+leg+balance+ankle+stability',
+  '5-10-5 Shuttle':'https://www.youtube.com/results?search_query=5+10+5+shuttle+agility+drill+form',
+  'Lateral Hurdle Hops':'https://www.youtube.com/results?search_query=lateral+hurdle+hops+plyometric',
+  'Bird Dog':'https://www.youtube.com/results?search_query=bird+dog+exercise+core+form',
   'Calf Raise + Slow Lower':'https://www.youtube.com/results?search_query=calf+raise+eccentric+form',
   'Lateral Ankle Hop':'https://www.youtube.com/results?search_query=lateral+ankle+hops+stability',
 };
@@ -446,10 +449,10 @@ function getJazMod(name){const p=getJP();const hip=['Back Squat','Trap Bar Deadl
 function buildWx(){
   if(!cd)return;const f=cp?.flag,b=gb();let html='';
   if(f==='acl'){const ph=ACL_PHASES[aclP-1];if(ph.fullProgram){html+=`<div class="mod-flag"><div class="fi">✅</div><div class="ft"><strong>Phase 4 — Full Program</strong><br>Full loads. Finisher at 50% volume.</div></div>`;}else{html+=`<div class="mod-flag"><div class="fi">⚕️</div><div class="ft"><strong>${ph.label}</strong><br>${ph.desc}</div></div>`;html+=buildACLWx(ph);html+=buildFin(f);html+=`<button class="save-btn" onclick="saveWx()">Save Session ✓</button><button class="secondary-btn" onclick="rstWx()">Reset</button>`;document.getElementById('workout-content').innerHTML=html;return;}}
-  if(b.phase==='TEST'||b.phase==='RETEST'){document.getElementById('workout-content').innerHTML=`<div class="card" style="border-color:var(--gold-d)"><div class="card-title">${b.phase==='RETEST'?'Retest':'Max Testing'} Week</div><div class="card-sub">Go to Maxes tab to enter your results. Weights auto-calculate once saved.</div></div>`;return;}
-  const wx=WX[cd];
   if(f==='ankle'||f==='ankle_mod')html+=bPre('🦶 Ankle Prehab — Required',ANKLE_PRE,'ankle');
   if(f==='posture'||cp?.name==='Aly'||cp?.name==='Alise')html+=bPre('🏀 Defensive Posture — Required',POSTURE_PRE,'posture');
+  if(b.phase==='TEST'||b.phase==='RETEST'){html+=`<div class="card" style="border-color:var(--gold-d)"><div class="card-title">${b.phase==='RETEST'?'Retest':'Max Testing'} Week</div><div class="card-sub">Go to Maxes tab to enter your results. Weights auto-calculate once saved.</div></div>`;document.getElementById('workout-content').innerHTML=html;return;}
+  const wx=WX[cd];
   wx.sections.forEach((sec,si)=>{
     html+=`<div class="ex-section"><div class="ex-section-hdr"><span class="ex-section-title">${sec.title}</span></div>`;
     sec.exercises.forEach((ex,ei)=>{
@@ -478,7 +481,48 @@ function buildWx(){
   document.getElementById('workout-content').innerHTML=html;
 }
 function buildACLWx(ph){let html=`<div class="ex-section"><div class="ex-section-hdr"><span class="ex-section-title">Phase ${ph.phase} Exercises</span></div>`;ph.exercises.forEach((ex,i)=>{const id=`acl-${i}`,done=sd[id+'-all'];let wt=null;if(ex.key&&ex.type){const pct=ex.type==='upper'?.65:.5;wt=adj[id]||cw(ex.key,pct);}html+=`<div class="ex-card"><div class="ex-header"><div><div class="ex-name">${ex.name}</div><div class="ex-scheme">${ex.sets||3}×${ex.reps||'—'} · ${ex.rest?Math.floor(ex.rest/60)+' min':''}</div></div><button class="ex-done-btn ${done?'done':''}" onclick="togAll('${id}',${ex.sets||3})">${done?'✓':'○'}</button></div>`;if(wt)html+=`<div class="ex-weight-row"><span class="ex-weight-label">Target</span><span class="ex-weight-val" id="wt-${id}">${wt}</span><span class="ex-weight-unit">lbs</span><div class="adj-wrap"><div class="adj-btn" onclick="adjW('${id}','${ex.key}',.65,-5)">−</div><div class="adj-btn" onclick="adjW('${id}','${ex.key}',.65,5)">+</div></div></div>`;else if(ex.weight)html+=`<div class="ex-weight-row"><span class="ex-weight-label">Load</span><span style="font-size:13px;color:var(--gold)">${ex.weight}</span></div>`;html+=`<div class="set-row">${Array.from({length:ex.sets||3},(_,s)=>`<div class="set-btn ${sd[id+'-'+(s+1)]?'done':''}" onclick="togSet('${id}',${s+1})">S${s+1}</div>`).join('')}</div>`;if(ex.note)html+=`<div class="ex-note">💡 ${ex.note}</div>`;html+=`<a class="watch-btn" href="${getYT(ex.name)}" target="_blank">▶ Watch Demo</a>`;html+=`</div>`;});html+=`</div>`;return html;}
-function buildFin(flag){const w=gw(),fi=(w-1)%3,isACL=flag==='acl',half=isACL&&aclP===4,items=isACL&&aclP<4?ACL_FIN:FINS[fi].items,lbl=isACL&&aclP<4?'ACL Recovery Finisher':FINS[fi].label+(half?' (50% Vol)':'');const show=half?items.slice(0,3):items;let html=`<div class="finisher-card"><div class="finisher-hdr"><h3>⚡ ${lbl}</h3><span>Fin ${isACL?'ACL':FINS[fi].id}</span></div><div style="padding:0 0 8px">`;show.forEach((item,i)=>{html+=`<div class="plyo-item"><div class="plyo-check ${ply[i]?'done':''}" onclick="togPly(${i})">${ply[i]?'✓':''}</div><div><div class="plyo-name">${item.name}</div><div class="plyo-detail">${item.detail}</div><span class="plyo-tag tag-${item.tag}">${item.tag.toUpperCase()}</span></div></div>`;});html+=`</div></div>`;return html;}
+function buildFin(flag){
+  const w=gw(),fi=(w-1)%3,isACL=flag==='acl',half=isACL&&aclP===4;
+  const items=isACL&&aclP<4?ACL_FIN:FINS[fi].items;
+  const lbl=isACL&&aclP<4?'ACL Recovery Finisher':FINS[fi].label+(half?' (50% Vol)':'');
+  const show=half?items.slice(0,3):items;
+  const PLYO_NOTES={
+    'Box Jumps':'Land softly — absorb through ankle, knee, hip. Stick for 2 full seconds before next rep.',
+    'Broad Jumps':'Drive arms back then forward. Stick every landing. Distance AND control.',
+    'Trap Bar Jump Squat':'Explode up from the bottom. Land controlled. Speed is the goal not weight.',
+    'Lateral Bounds':'Push off outside foot. Land on opposite foot. Stick it — no hopping.',
+    'Single-Leg Balance':'Eyes closed progression. Ankle wobble is normal — that is your brain rewiring.',
+    '5-10-5 Shuttle':'Stay LOW on cuts. Plant outside foot. Hips back not up on direction change.',
+    'Lateral Hurdle Hops':'Minimal ground contact. Think hot coals — get off the ground fast.',
+    'Depth Drop (land only)':'Step off — do NOT jump off. Land quiet. Knees track over toes.',
+    'Depth Jump':'Drop → land → immediately jump. No pause. Reactive strength is the goal.',
+    'Single-Leg Hop + Stick':'Land and HOLD 2 full seconds. No wobble before next rep.',
+    'Nordic Hamstring Curl':'Most important ACL prevention exercise. Slow eccentric — 3-4 sec down.',
+    'Farmer Carry':'Shoulders back and down. Core braced. Walk tall.',
+    'Ab Wheel Rollout':'Hips straight. Back flat. Go to edge of control only.',
+    'Dead Bug':'Lower back stays flat on floor the entire time. Breathe out on extension.',
+    'Pallof Press':'Press straight out. Hold 1 sec. Do NOT rotate. Fight the band.',
+    'Plank Variations':'Squeeze glutes and quads. Do not let hips sag or pike.',
+    'Bird Dog':'Slow and controlled. Opposite arm and leg. Do not rotate hips.',
+    'Copenhagen Plank':'Full hip extension at top. Side of foot on bench. Hold strong.',
+  };
+  let html=`<div class="finisher-card"><div class="finisher-hdr"><h3>⚡ ${lbl}</h3><span>Fin ${isACL?'ACL':FINS[fi].id}</span></div><div style="padding:0 0 8px">`;
+  show.forEach((item,i)=>{
+    const note=PLYO_NOTES[item.name]||'';
+    html+=`<div class="plyo-item">
+      <div class="plyo-check ${ply[i]?'done':''}" onclick="togPly(${i})">${ply[i]?'✓':''}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="plyo-name">${item.name}</div>
+        <div class="plyo-detail">${item.detail}</div>
+        ${note?`<div class="ex-note" style="margin-top:4px;border-top:none;padding-top:0;">💡 ${note}</div>`:''}
+        <span class="plyo-tag tag-${item.tag}">${item.tag.toUpperCase()}</span>
+        <a class="watch-btn" href="${getYT(item.name)}" target="_blank">▶ Watch Demo</a>
+      </div>
+    </div>`;
+  });
+  html+=`</div></div>`;
+  return html;
+}
 function bPre(title,items,key){let html=`<div class="prehab-section"><div class="prehab-hdr">${title}</div>`;items.forEach((item,i)=>{const k=`${key}-${i}`;html+=`<div class="prehab-item"><div class="prehab-check ${preh[k]?'done':''}" onclick="togPre('${k}')">${preh[k]?'✓':''}</div><div><div class="prehab-name">${item.name}</div><div class="prehab-detail">${item.detail}</div><a class="watch-btn" href="${getYT(item.name)}" target="_blank">▶ Watch Demo</a></div></div>`;});html+=`</div>`;return html;}
 function togSet(id,s){const k=id+'-'+s;sd[k]=!sd[k];document.querySelector(`[onclick="togSet('${id}',${s})"]`)?.classList.toggle('done',sd[k]);}
 function togAll(id,n){const ak=id+'-all',ns=!sd[ak];sd[ak]=ns;for(let s=1;s<=n;s++)sd[id+'-'+s]=ns;buildWx();}
