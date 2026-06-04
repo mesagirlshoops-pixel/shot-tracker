@@ -261,9 +261,12 @@ let makes = Array(10).fill(0);
 async function apiCall(params) {
   try {
     const url = SCRIPT_URL + '?' + new URLSearchParams(params).toString();
-    const res = await fetch(url, { method: 'GET' });
+    const res = await fetch(url, {
+      method: 'GET',
+      redirect: 'follow',
+    });
     const text = await res.text();
-    return JSON.parse(text);
+    try { return JSON.parse(text); } catch(e) { return { success: false, error: 'Bad response: ' + text.slice(0,100) }; }
   } catch(e) {
     return { success: false, error: e.toString() };
   }
@@ -378,7 +381,7 @@ async function saveSession() {
   if (result.success) {
     showToast('Saved! ' + result.grandTotal + ' total makes ✓');
   } else {
-    showToast('Error: ' + (result.error || 'unknown'));
+    showToast('Error: ' + (result.error || 'unknown') + ' | player: ' + currentPlayer.name);
   }
 }
 

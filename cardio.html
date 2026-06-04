@@ -627,10 +627,10 @@ function resetSession() {
 async function apiCall(params) {
   try {
     const url = SCRIPT_URL + '?' + new URLSearchParams(params).toString();
-    const res = await fetch(url);
+    const res = await fetch(url, { method: 'GET', redirect: 'follow' });
     const text = await res.text();
     try { return JSON.parse(text); } catch(e) { return {success:true}; }
-  } catch(e) { return {success:false}; }
+  } catch(e) { return {success:false, error:e.toString()}; }
 }
 
 function showToast(msg) {
