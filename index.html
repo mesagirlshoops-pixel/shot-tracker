@@ -200,7 +200,7 @@ body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 <div class="toast" id="toast"></div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-xO2z6PWFi2MzWRqXTc8pxqu9W1_tQFfbNFx-KDgn64aIkXfyA5UlKfCMF7XlqIfj/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz3C3k33Utkn54wwvKIemnnMNPlQuUkEGQYgfpq3Tzy7wAgkWRFw65cjyueD-aee7H8/exec';
 
 const VARSITY_PLAYERS = [
   { name:'Moana',     group:'Guard', pos:'PG' },
@@ -381,7 +381,7 @@ async function saveSession() {
   if (result.success) {
     showToast('Saved! ' + result.grandTotal + ' total makes ✓');
   } else {
-    showToast('Error: ' + (result.error || 'unknown') + ' | player: ' + currentPlayer.name);
+    showToast('Error saving — try again');
   }
 }
 
@@ -507,7 +507,7 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 6000);
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 buildLogin();
