@@ -211,7 +211,7 @@ const VARSITY_PLAYERS = [
   { name:'Khloe',     group:'Guard', pos:'W'  },
   { name:'Naomi',     group:'Guard', pos:'W'  },
   { name:'Daney',     group:'Guard', pos:'W'  },
-  { name:'Kai',       group:'Guard', pos:'W'  },
+  { name:'Kylynn',       group:'Guard', pos:'W'  },
   { name:'Anela',     group:'Big',   pos:'PF' },
   { name:'Serena',    group:'Big',   pos:'C'  },
   { name:'Aly',       group:'Big',   pos:'PF' },
@@ -304,17 +304,9 @@ function startSession() {
 }
 
 function switchPlayer() {
-  currentPlayer = null;
-  isJV = false;
-  makes = Array(10).fill(0);
-  document.getElementById('app-shell').style.display = 'none';
-  document.getElementById('screen-login').style.display = 'block';
-  document.getElementById('screen-login').classList.add('active');
-  document.getElementById('hdr-sub').textContent = 'Murrieta Mesa · 2026–27';
-  document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
-  const btn = document.getElementById('btn-start');
-  btn.disabled = true;
-  btn.textContent = 'Select Player to Begin';
+  sessionStorage.removeItem('rams_player');
+  sessionStorage.removeItem('rams_group');
+  window.location.href = './hub.html';
 }
 
 function buildShots() {
@@ -514,6 +506,31 @@ function showToast(msg) {
 }
 
 buildLogin();
+
+// Auto-login if coming from hub
+(function() {
+  const stored = sessionStorage.getItem('rams_player');
+  const group  = sessionStorage.getItem('rams_group');
+  if (stored) {
+    const isJV = group === 'Dev';
+    const allP = [...VARSITY_PLAYERS, ...JV_PLAYERS];
+    const p = allP.find(x => x.name === stored);
+    if (p) {
+      currentPlayer = { name: p.name, group: p.group };
+      isJV = group === 'Dev';
+      // Auto-start without showing login screen
+      document.getElementById('screen-login').style.display = 'none';
+      document.getElementById('app-shell').style.display = 'block';
+      document.getElementById('hdr-sub').textContent = p.name + ' · ' + (isJV ? 'Dev Group' : 'Varsity');
+      document.getElementById('jv-banner').style.display = isJV ? 'block' : 'none';
+      const today = new Date().toISOString().slice(0,10);
+      document.getElementById('date-input').value = today;
+      makes = Array(10).fill(0);
+      buildShots();
+      loadTodayData();
+    }
+  }
+})();
 </script>
 </body>
 </html>

@@ -163,7 +163,7 @@ const VARSITY_PLAYERS = [
   {name:'Khloe',    flag:'knee',     flagNote:'Knee modification active. No heavy impact plyos.'},
   {name:'Naomi',    flag:'acl',      flagNote:'ACL protocol — modified drills only. No cutting or impact.'},
   {name:'Daney',    flag:'acl',      flagNote:'ACL protocol — modified drills only. No cutting or impact.'},
-  {name:'Kai',      flag:'locked',   flagNote:'Complete doctor rehab first. Notify coach when cleared.'},
+  {name:'Kylynn',      flag:'locked',   flagNote:'Complete doctor rehab first. Notify coach when cleared.'},
   {name:'Anela',    flag:'ankle_mod',flagNote:'High ankle sprain — no lateral stress. Modified session active.'},
   {name:'Serena',   flag:'knee',     flagNote:'Knee modification — reduce impact volume as needed.'},
   {name:'Aly',      flag:null,       flagNote:null},
@@ -425,7 +425,7 @@ function selectPlayer(name, jv, el) {
 function startApp() {
   if (!currentPlayer) return;
   if (currentPlayer.flag === 'locked') {
-    alert('Kai — complete your doctor-assigned rehab first. Notify Coach Rudy when cleared to begin training.');
+    alert('Kylynn — complete your doctor-assigned rehab first. Notify Coach Rudy when cleared to begin training.');
     return;
   }
   document.getElementById('screen-login').style.display = 'none';
@@ -437,14 +437,10 @@ function startApp() {
 }
 
 function switchPlayer() {
-  currentPlayer = null;
-  currentSession = null;
-  drillsDone = {};
-  document.getElementById('app-shell').style.display = 'none';
-  document.getElementById('screen-login').style.display = 'block';
-  document.getElementById('screen-login').classList.add('active');
-  document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById('btn-start').disabled = true;
+  sessionStorage.removeItem('rams_player');
+  sessionStorage.removeItem('rams_group');
+  window.location.href = './hub.html';
+}
   document.getElementById('session-content').innerHTML = '<div style="text-align:center;padding:30px 20px;color:var(--dim);font-size:13px;">Select Session A or B above</div>';
   document.getElementById('mod-flag-wrap').innerHTML = '';
 }
@@ -646,6 +642,28 @@ function showToast(msg) {
 }
 
 buildLogin();
+(function(){
+  const stored = sessionStorage.getItem('rams_player');
+  const grp    = sessionStorage.getItem('rams_group');
+  if (!stored) return;
+  const all = [...VARSITY_PLAYERS, ...JV_PLAYERS];
+  const p = all.find(x => x.name === stored);
+  if (!p) return;
+  const jv = grp === 'Dev';
+  if (p.flag === 'locked') {
+    alert(p.name + ' — complete your doctor rehab first. Notify Coach Rudy when cleared.');
+    return;
+  }
+  currentPlayer = p;
+  isJV = jv;
+  document.getElementById('screen-login').style.display = 'none';
+  document.getElementById('app-shell').style.display = 'block';
+  document.getElementById('hdr-sub').textContent = p.name + (jv ? ' · Dev Group' : ' · Varsity');
+  updateWeekDisplay();
+  showModFlag();
+  if (jv) showJVBanner();
+  if (p.flag === 'ankle_mod') buildAnkleChk();
+})();
 </script>
 </body>
 </html>

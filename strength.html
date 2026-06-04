@@ -201,7 +201,7 @@ const VP=[
   {name:'Khloe',    group:'Guard',pos:'W', flag:'knee',    fn:'Knee mod active — heavy lower body replaced with safer alternatives.'},
   {name:'Naomi',    group:'Guard',pos:'W', flag:'acl',     fn:'ACL protocol — phase-based return to training.'},
   {name:'Daney',    group:'Guard',pos:'W', flag:'acl',     fn:'ACL protocol — phase-based return to training.'},
-  {name:'Kai',      group:'Guard',pos:'W', flag:'locked',  fn:'Complete doctor rehab first. Notify Coach Rudy when cleared.'},
+  {name:'Kylynn',      group:'Guard',pos:'W', flag:'locked',  fn:'Complete doctor rehab first. Notify Coach Rudy when cleared.'},
   {name:'Anela',    group:'Guard',pos:'W', flag:'ankle_mod',fn:'High ankle sprain — modified sessions. Daily swelling check-in required.'},
   {name:'Serena',   group:'Big',  pos:'C', flag:'knee',    fn:'Moderate knee pain — reduce load if needed.'},
   {name:'Aly',      group:'Big',  pos:'PF',flag:'hand',    fn:'Right hand ligament — grip exercises flagged. Modify if bothering you today.'},
@@ -436,7 +436,7 @@ function startApp(){
   if(cp.flag==='ankle_mod')buildAnkleChk();
   if(isJV)document.getElementById('jv-banner-wrap').innerHTML=`<div class="jv-banner"><strong>Development Group</strong> — Same program. Your own leaderboard. Use this summer to earn your spot. 🐏</div>`;
 }
-function switchPlayer(){cp=null;isJV=false;pm={};cd=null;sd={};preh={};ply={};adj={};aclP=1;ankR=0;document.getElementById('app-shell').style.display='none';document.getElementById('bottom-nav').style.display='none';document.getElementById('screen-login').style.display='block';document.getElementById('screen-login').classList.add('active');document.querySelectorAll('.player-btn').forEach(b=>b.classList.remove('selected'));document.getElementById('btn-start').disabled=true;['jv-banner-wrap','mod-flag-wrap','anela-check-wrap'].forEach(id=>document.getElementById(id).innerHTML='');document.getElementById('acl-phase-wrap').style.display='none';document.getElementById('workout-content').innerHTML='<div style="text-align:center;padding:30px 20px;color:var(--dim);font-size:13px;">Select a workout type above</div>';}
+function switchPlayer(){sessionStorage.removeItem('rams_player');sessionStorage.removeItem('rams_group');window.location.href='./hub.html';}
 function showFlags2(){const f=cp?.flag;if(!f||f==='posture'){document.getElementById('mod-flag-wrap').innerHTML='';return;}const notes={acl:'⚕️ ACL Protocol — Select your phase below.',ankle:'⚠️ Ankle prehab added to every session. Report pain.',ankle_mod:'⚠️ Ankle mod active — modified sessions. Swelling check below.',back:'⚠️ Back ramp-up active — loads adjust by week.',knee:'⚠️ Knee mod — heavy lower body replaced.',hand:'⚠️ Right hand flag — grip exercises marked. Modify as needed.'};if(notes[f])document.getElementById('mod-flag-wrap').innerHTML=`<div class="mod-flag"><div class="fi">⚠️</div><div class="ft"><strong>${cp.fn}</strong>${notes[f]}</div></div>`;}
 function buildAnkleChk(){document.getElementById('anela-check-wrap').innerHTML=`<div class="anela-check"><h4>💛 Anela — Ankle Check-In</h4><p style="font-size:12px;color:var(--dim);margin-bottom:8px">How is your ankle TODAY? (1=great · 5=painful)</p><div class="ankle-rating">${[1,2,3,4,5].map(n=>`<button class="ar-btn ${ankR===n?'sel-'+n:''}" onclick="setAnkR(${n})">${n}</button>`).join('')}</div>${ankR>=4?'<p style="font-size:12px;color:#e08080;margin-top:8px;font-weight:600">⚠️ Rating 4-5 — Notify Coach Rudy before starting.</p>':ankR>0?'<p style="font-size:12px;color:var(--gbright);margin-top:8px">✓ OK to train — modified session active.</p>':''}</div>`;}
 function setAnkR(n){ankR=n;buildAnkleChk();}
@@ -543,6 +543,28 @@ async function api(p){try{const r=await fetch(SCRIPT_URL+'?'+new URLSearchParams
 function showTab(tab,btn){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('screen-'+tab).classList.add('active');if(btn)btn.classList.add('active');}
 function showT(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 buildLogin();
+(function(){
+  const stored=sessionStorage.getItem('rams_player');
+  const grp=sessionStorage.getItem('rams_group');
+  if(!stored) return;
+  const all=[...VP,...JP];
+  const p=all.find(x=>x.name===stored);
+  if(!p) return;
+  isJV = grp==='Dev';
+  cp=p;
+  document.getElementById('screen-login').style.display='none';
+  document.getElementById('app-shell').style.display='block';
+  document.getElementById('bottom-nav').style.display='flex';
+  document.getElementById('hdr-sub').textContent=p.name+(isJV?' · Dev':' · Varsity');
+  loadMaxes2();updateWkDisplay();buildMaxForm2();showFlags2();
+  if(cp.flag==='acl')buildACLSel();
+  if(cp.flag==='ankle_mod')buildAnkleChk();
+  if(isJV)document.getElementById('jv-banner-wrap').innerHTML=`<div class="jv-banner"><strong>Development Group</strong> — Same program. Your own leaderboard. Use this summer to earn your spot. 🐏</div>`;
+  if(cp.flag==='locked'){
+    document.getElementById('standard-workout-wrap').innerHTML=`<div class="locked-screen"><div class="lock-icon">🔒</div><h2>Program Locked</h2><p>${cp.name} — complete your doctor-assigned rehabilitation first.<br><br>When cleared, notify <strong style="color:var(--gold)">Coach Rudy</strong> and your program unlocks. 🐏</p></div>`;
+    document.getElementById('hdr-sub').textContent=cp.name+' · Locked';
+  }
+})();
 </script>
 </body>
 </html>
