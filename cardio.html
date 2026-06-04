@@ -443,9 +443,6 @@ function switchPlayer() {
   sessionStorage.removeItem('rams_group');
   window.location.href = './hub.html';
 }
-  document.getElementById('session-content').innerHTML = '<div style="text-align:center;padding:30px 20px;color:var(--dim);font-size:13px;">Select Session A or B above</div>';
-  document.getElementById('mod-flag-wrap').innerHTML = '';
-}
 
 function updateWeekDisplay() {
   const wk = getCurrentWeek();

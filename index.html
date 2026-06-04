@@ -513,25 +513,21 @@ buildLogin();
 (function() {
   const stored = sessionStorage.getItem('rams_player');
   const group  = sessionStorage.getItem('rams_group');
-  if (stored) {
-    const isJV = group === 'Dev';
-    const allP = [...VARSITY_PLAYERS, ...JV_PLAYERS];
-    const p = allP.find(x => x.name === stored);
-    if (p) {
-      currentPlayer = { name: p.name, group: p.group };
-      isJV = group === 'Dev';
-      // Auto-start without showing login screen
-      document.getElementById('screen-login').style.display = 'none';
-      document.getElementById('app-shell').style.display = 'block';
-      document.getElementById('hdr-sub').textContent = p.name + ' · ' + (isJV ? 'Dev Group' : 'Varsity');
-      document.getElementById('jv-banner').style.display = isJV ? 'block' : 'none';
-      const today = new Date().toISOString().slice(0,10);
-      document.getElementById('date-input').value = today;
-      makes = Array(10).fill(0);
-      buildShots();
-      loadTodayData();
-    }
-  }
+  if (!stored) return;
+  const allP = [...VARSITY_PLAYERS, ...JV_PLAYERS];
+  const p = allP.find(x => x.name === stored);
+  if (!p) return;
+  const jv = group === 'Dev';
+  currentPlayer = { name: p.name, group: p.group };
+  document.getElementById('screen-login').style.display = 'none';
+  document.getElementById('app-shell').style.display = 'block';
+  document.getElementById('hdr-sub').textContent = p.name + ' · ' + (jv ? 'Dev Group' : 'Varsity');
+  document.getElementById('jv-banner').style.display = jv ? 'block' : 'none';
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('date-input').value = today;
+  makes = Array(10).fill(0);
+  buildShots();
+  loadTodayData();
 })();
 </script>
 </body>
