@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Rams Coach — Player Evaluation</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--green:#1a5c2a;--gmid:#2d8a42;--gbright:#4caf68;--gdark:#0a110a;--gold:#c4973a;--gold-l:#e8b84b;--gold-d:#8a6820;--red:#c0392b;--bg:#0f1a0f;--card:#1a261a;--card2:#1f2e1f;--border:#2a3d2a;--border2:#1f2e1f;--text:#d4e8d4;--dim:#6b8a6b;--bright:#f0f8f0;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);min-height:100vh;padding-bottom:40px;}
+.hdr{background:linear-gradient(135deg,var(--gdark),var(--green));padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border);}
+.hdr h1{font-family:'Bebas Neue';font-size:20px;color:var(--gold-l);letter-spacing:2px;}
+.hdr p{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px;}
+.exit-btn{font-family:'Barlow Condensed';font-size:11px;font-weight:600;letter-spacing:1px;color:var(--dim);background:transparent;border:1px solid var(--border);border-radius:5px;padding:5px 10px;cursor:pointer;}
+/* PIN */
+.pin-screen{padding:32px 20px;text-align:center;}
+.pin-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;max-width:320px;margin:0 auto;}
+.pin-card h2{font-family:'Bebas Neue';font-size:22px;color:var(--gold-l);letter-spacing:2px;margin-bottom:6px;}
+.pin-card p{font-size:12px;color:var(--dim);margin-bottom:16px;}
+.pin-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:24px;font-weight:700;color:var(--bright);text-align:center;letter-spacing:8px;outline:none;margin-bottom:12px;font-family:'Barlow';}
+.pin-btn{width:100%;background:var(--green);color:white;border:none;border-radius:8px;padding:13px;font-family:'Barlow Condensed';font-size:15px;font-weight:700;letter-spacing:2px;cursor:pointer;}
+.pin-error{font-size:12px;color:#e08080;margin-bottom:8px;display:none;}
+/* MAIN */
+.main{padding:14px 14px 20px;}
+.section-label{font-family:'Barlow Condensed';font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin:16px 0 8px;padding-left:2px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;}
+.card-title{font-family:'Bebas Neue';font-size:17px;color:var(--gold-l);letter-spacing:1px;margin-bottom:12px;}
+/* PLAYER HEADER */
+.player-header-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.field-wrap{display:flex;flex-direction:column;gap:4px;}
+.field-wrap.full{grid-column:1/-1;}
+.field-wrap label{font-size:10px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;font-family:'Barlow Condensed';}
+.field-wrap input,.field-wrap select,.field-wrap textarea{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:9px 10px;font-size:13px;color:var(--bright);outline:none;font-family:'Barlow';width:100%;}
+.field-wrap textarea{resize:vertical;min-height:70px;line-height:1.5;}
+.field-wrap input:focus,.field-wrap select:focus,.field-wrap textarea:focus{border-color:var(--gbright);}
+.field-wrap select option{background:var(--bg);}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.stat-wrap{display:flex;flex-direction:column;gap:4px;text-align:center;}
+.stat-wrap label{font-size:9px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;font-family:'Barlow Condensed';}
+.stat-wrap input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 4px;font-size:14px;font-weight:700;color:var(--gbright);text-align:center;outline:none;font-family:'Bebas Neue';width:100%;}
+.stat-wrap input:focus{border-color:var(--gbright);}
+/* SKILL RATINGS */
+.skill-row{display:flex;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border2);gap:10px;}
+.skill-row:last-child{border-bottom:none;}
+.skill-name{font-size:12px;font-weight:600;color:var(--bright);min-width:130px;flex-shrink:0;padding-top:6px;}
+.skill-right{flex:1;}
+.rating-btns{display:flex;gap:5px;margin-bottom:6px;}
+.rb{width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:var(--card2);font-family:'Bebas Neue';font-size:16px;color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;flex-shrink:0;}
+.rb.sel-1{background:rgba(192,57,43,.3);border-color:#e08080;color:#f0b0b0;}
+.rb.sel-2{background:rgba(196,98,26,.3);border-color:#e8a060;color:#f0c090;}
+.rb.sel-3{background:rgba(196,151,58,.25);border-color:var(--gold);color:var(--gold-l);}
+.rb.sel-4{background:rgba(26,92,42,.3);border-color:var(--gmid);color:var(--gbright);}
+.rb.sel-5{background:rgba(76,175,104,.25);border-color:var(--gbright);color:#90e8a0;}
+.skill-comment{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:7px 9px;font-size:11px;color:var(--dim);outline:none;font-family:'Barlow';resize:none;min-height:34px;line-height:1.4;}
+.skill-comment:focus{border-color:var(--gbright);color:var(--bright);}
+.rating-legend{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.rl-item{font-size:10px;color:var(--dim);font-family:'Barlow Condensed';letter-spacing:.5px;}
+.rl-dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:3px;vertical-align:middle;}
+/* SECTION DIVIDER */
+.skill-section-hdr{background:var(--green);border-radius:6px 6px 0 0;padding:8px 14px;font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:white;margin-top:0;}
+.skills-block{background:var(--card2);border:1px solid var(--border2);border-top:none;border-radius:0 0 6px 6px;padding:4px 14px 8px;margin-bottom:12px;}
+/* BULLETS */
+.bullet-section{margin-bottom:12px;}
+.bullet-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.bullet-row{display:flex;align-items:center;gap:8px;}
+.bullet-row input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:8px 10px;font-size:12px;color:var(--bright);outline:none;font-family:'Barlow';}
+.bullet-row input:focus{border-color:var(--gbright);}
+.bullet-row button{background:rgba(192,57,43,.2);border:none;border-radius:4px;color:#e08080;padding:6px 8px;cursor:pointer;font-size:12px;flex-shrink:0;}
+.add-bullet-btn{background:transparent;border:1px dashed var(--border);border-radius:5px;padding:7px;width:100%;color:var(--dim);font-size:11px;cursor:pointer;font-family:'Barlow Condensed';letter-spacing:1px;}
+/* SAVE */
+.save-btn{width:100%;background:var(--gold);color:var(--gdark);border:none;border-radius:10px;padding:14px;font-family:'Barlow Condensed';font-size:15px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;margin-bottom:10px;}
+.print-btn{width:100%;background:var(--blue,#1a5c8a);color:white;border:none;border-radius:10px;padding:14px;font-family:'Barlow Condensed';font-size:15px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;margin-bottom:8px;}
+.secondary-btn{width:100%;background:transparent;color:var(--dim);border:1px solid var(--border);border-radius:10px;padding:11px;font-family:'Barlow Condensed';font-size:13px;font-weight:600;letter-spacing:1px;cursor:pointer;margin-bottom:8px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green);color:white;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div><h1>📋 PLAYER EVALUATION</h1><p>Coach Portal · Rams 2026–27</p></div>
+  <button class="exit-btn" onclick="window.location.href='./hub.html'">Exit</button>
+</div>
+
+<!-- PIN -->
+<div id="pin-screen" class="pin-screen">
+  <div class="pin-card">
+    <h2>Coach Access</h2>
+    <p>Enter your staff PIN to continue</p>
+    <div class="pin-error" id="pin-error">Incorrect PIN</div>
+    <input type="password" class="pin-input" id="pin-input" maxlength="4" placeholder="••••" inputmode="numeric">
+    <button class="pin-btn" onclick="checkPin()">Enter</button>
+  </div>
+</div>
+
+<!-- EVALUATION FORM -->
+<div id="eval-main" style="display:none">
+<div class="main">
+
+  <!-- PLAYER INFO -->
+  <div class="section-label">Player Information</div>
+  <div class="card">
+    <div class="player-header-grid">
+      <div class="field-wrap">
+        <label>Player Name</label>
+        <select id="f-player">
+          <option value="">Select player...</option>
+          <option>Moana</option><option>Jazae</option><option>Josephine</option>
+          <option>Malia</option><option>Alise</option><option>Khloe</option>
+          <option>Naomi</option><option>Daney</option><option>Kylynn</option>
+          <option>Serena</option><option>Aly</option><option>Anela</option>
+        </select>
+      </div>
+      <div class="field-wrap">
+        <label>Jersey #</label>
+        <input type="text" id="f-number" placeholder="e.g. 23">
+      </div>
+      <div class="field-wrap">
+        <label>Year</label>
+        <select id="f-year">
+          <option>Freshman</option><option>Sophomore</option>
+          <option>Junior</option><option>Senior</option>
+        </select>
+      </div>
+      <div class="field-wrap">
+        <label>Position</label>
+        <select id="f-position">
+          <option>Guard</option><option>Wing</option><option>Forward</option>
+          <option>Post</option><option>Point Guard</option>
+        </select>
+      </div>
+      <div class="field-wrap">
+        <label>Evaluation Cycle</label>
+        <select id="f-cycle">
+          <option>Summer 2026</option>
+          <option>Preseason 2026</option>
+          <option>Post-Season 2027</option>
+        </select>
+      </div>
+      <div class="field-wrap">
+        <label>Date</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="field-wrap full">
+        <label>Role on Team</label>
+        <input type="text" id="f-role" placeholder="e.g. Starting point guard, primary ball handler, defensive anchor">
+      </div>
+      <div class="field-wrap full">
+        <label>How Role Can Expand</label>
+        <textarea id="f-role-expand" placeholder="What would need to happen for this player's role to grow..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="section-label">Season Statistics</div>
+  <div class="card">
+    <div class="stats-grid">
+      <div class="stat-wrap"><label>PPG</label><input type="text" id="s-ppg" placeholder="—"></div>
+      <div class="stat-wrap"><label>FG%</label><input type="text" id="s-fg" placeholder="—"></div>
+      <div class="stat-wrap"><label>3PT%</label><input type="text" id="s-3pt" placeholder="—"></div>
+      <div class="stat-wrap"><label>FT%</label><input type="text" id="s-ft" placeholder="—"></div>
+      <div class="stat-wrap"><label>AST/G</label><input type="text" id="s-ast" placeholder="—"></div>
+      <div class="stat-wrap"><label>REB/G</label><input type="text" id="s-reb" placeholder="—"></div>
+      <div class="stat-wrap"><label>STL/G</label><input type="text" id="s-stl" placeholder="—"></div>
+      <div class="stat-wrap"><label>TO/G</label><input type="text" id="s-to" placeholder="—"></div>
+    </div>
+  </div>
+
+  <!-- SKILL RATINGS -->
+  <div class="section-label">Skill Ratings</div>
+  <div class="rating-legend">
+    <span class="rl-item"><span class="rl-dot" style="background:#c0392b"></span>1 — Needs major work</span>
+    <span class="rl-item"><span class="rl-dot" style="background:#c4621a"></span>2 — Developing</span>
+    <span class="rl-item"><span class="rl-dot" style="background:#c4973a"></span>3 — Average</span>
+    <span class="rl-item"><span class="rl-dot" style="background:#2d8a42"></span>4 — Above average</span>
+    <span class="rl-item"><span class="rl-dot" style="background:#4caf68"></span>5 — Elite</span>
+  </div>
+
+  <!-- OFFENSE -->
+  <div class="skill-section-hdr">Offense</div>
+  <div class="skills-block" id="offense-skills"></div>
+
+  <!-- DEFENSE -->
+  <div class="skill-section-hdr">Defense</div>
+  <div class="skills-block" id="defense-skills"></div>
+
+  <!-- CHARACTER -->
+  <div class="skill-section-hdr">Character & Intangibles</div>
+  <div class="skills-block" id="character-skills"></div>
+
+  <!-- COACHABILITY -->
+  <div class="section-label">Coachability</div>
+  <div class="card">
+    <div class="skill-row" style="border:none;padding:0">
+      <div class="skill-name">Coachability</div>
+      <div class="skill-right">
+        <div class="rating-btns" id="rb-coachability"></div>
+        <textarea class="skill-comment" id="cc-coachability" placeholder="Seeks coaching, applies critique, responds to feedback..." style="min-height:60px"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRENGTHS -->
+  <div class="section-label">Strengths</div>
+  <div class="card">
+    <div class="card-title">Strength Areas</div>
+    <div id="strength-areas"></div>
+    <div class="field-wrap" style="margin-top:10px">
+      <label>Strength Summary (paragraph)</label>
+      <textarea id="f-strength-summary" placeholder="Write a summary paragraph about this player's strengths..."></textarea>
+    </div>
+  </div>
+
+  <!-- GROWTH -->
+  <div class="section-label">Growth Areas</div>
+  <div class="card">
+    <div class="card-title">Areas to Develop</div>
+    <div id="growth-areas"></div>
+    <div class="field-wrap" style="margin-top:10px">
+      <label>Growth Summary (paragraph)</label>
+      <textarea id="f-growth-summary" placeholder="Write a summary paragraph about growth areas and what's needed..."></textarea>
+    </div>
+  </div>
+
+  <!-- WAYS TO IMPROVE -->
+  <div class="section-label">Ways to Improve</div>
+  <div class="card">
+    <div id="improve-bullets"></div>
+  </div>
+
+  <!-- OVERALL NOTES -->
+  <div class="section-label">Overall Coach Notes</div>
+  <div class="card">
+    <div class="field-wrap">
+      <label>Private notes (not shared with player)</label>
+      <textarea id="f-private-notes" placeholder="Internal notes for coaching staff only..."></textarea>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <button class="save-btn" onclick="saveEvaluation()">Save Evaluation ✓</button>
+  <button class="print-btn" onclick="previewEvaluation()">Preview & Print PDF →</button>
+  <button class="secondary-btn" onclick="clearForm()">Clear Form</button>
+
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz3C3k33Utkn54wwvKIemnnMNPlQuUkEGQYgfpq3Tzy7wAgkWRFw65cjyueD-aee7H8/exec';
+const COACH_PIN = '4444';
+
+const OFFENSE_SKILLS = ['Offensive IQ','Shooting','Passing','Finishing','Rebounding','Playmaking'];
+const DEFENSE_SKILLS = ['Defending (Overall)','On-Ball Defense','Off-Ball Anticipation','Functional Strength & Body Control'];
+const CHARACTER_SKILLS = ['Attitude','Communication','Leadership','Effort','Practice Habits'];
+
+const ratings = {};
+const bulletLists = { strength: [], growth: [], improve: [] };
+
+// PIN
+document.getElementById('pin-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkPin(); });
+function checkPin() {
+  if (document.getElementById('pin-input').value === COACH_PIN) {
+    document.getElementById('pin-screen').style.display = 'none';
+    document.getElementById('eval-main').style.display = 'block';
+    initForm();
+  } else {
+    document.getElementById('pin-error').style.display = 'block';
+    document.getElementById('pin-input').value = '';
+  }
+}
+
+function initForm() {
+  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+  buildSkillBlock('offense-skills', OFFENSE_SKILLS, 'off');
+  buildSkillBlock('defense-skills', DEFENSE_SKILLS, 'def');
+  buildSkillBlock('character-skills', CHARACTER_SKILLS, 'char');
+  buildRatingBtns('coachability', 'rb-coachability');
+  buildBulletSection('strength-areas', 'strength', 'Strength Area', ['Leadership Qualities','High Level Defender','Shooting']);
+  buildBulletSection('growth-areas', 'growth', 'Growth Area', ['']);
+  buildBulletSection('improve-bullets', 'improve', 'Way to Improve', ['']);
+}
+
+function buildSkillBlock(containerId, skills, prefix) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = skills.map(skill => {
+    const key = prefix + '_' + skill.replace(/[^a-zA-Z]/g,'_');
+    return `<div class="skill-row">
+      <div class="skill-name">${skill}</div>
+      <div class="skill-right">
+        <div class="rating-btns" id="rb-${key}"></div>
+        <textarea class="skill-comment" id="cc-${key}" placeholder="Optional comment..."></textarea>
+      </div>
+    </div>`;
+  }).join('');
+  skills.forEach(skill => {
+    const key = prefix + '_' + skill.replace(/[^a-zA-Z]/g,'_');
+    buildRatingBtns(key, 'rb-'+key);
+  });
+}
+
+function buildRatingBtns(key, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  ratings[key] = 0;
+  container.innerHTML = [1,2,3,4,5].map(n =>
+    `<div class="rb" id="rb-${key}-${n}" onclick="setRating('${key}',${n})">${n}</div>`
+  ).join('');
+}
+
+function setRating(key, val) {
+  ratings[key] = val;
+  for (let n = 1; n <= 5; n++) {
+    const btn = document.getElementById(`rb-${key}-${n}`);
+    if (btn) {
+      btn.className = 'rb' + (n === val ? ` sel-${val}` : '');
+    }
+  }
+}
+
+function buildBulletSection(containerId, listKey, placeholder, defaults) {
+  bulletLists[listKey] = defaults.map(d => d);
+  renderBullets(containerId, listKey, placeholder);
+}
+
+function renderBullets(containerId, listKey, placeholder) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = `
+    <div class="bullet-list" id="bl-${listKey}">
+      ${bulletLists[listKey].map((val, i) => bulletRow(listKey, i, val, placeholder)).join('')}
+    </div>
+    <button class="add-bullet-btn" onclick="addBullet('${containerId}','${listKey}','${placeholder}')">+ Add ${placeholder}</button>`;
+}
+
+function bulletRow(listKey, i, val, placeholder) {
+  return `<div class="bullet-row">
+    <input type="text" value="${val}" placeholder="• ${placeholder}..." oninput="updateBullet('${listKey}',${i},this.value)">
+    <button onclick="removeBullet('${listKey}',${i})">✕</button>
+  </div>`;
+}
+
+function updateBullet(listKey, i, val) { bulletLists[listKey][i] = val; }
+function addBullet(containerId, listKey, placeholder) {
+  bulletLists[listKey].push('');
+  renderBullets(containerId, listKey, placeholder);
+}
+function removeBullet(listKey, i) {
+  bulletLists[listKey].splice(i, 1);
+  const maps = {strength:'strength-areas',growth:'growth-areas',improve:'improve-bullets'};
+  const placeholders = {strength:'Strength Area',growth:'Growth Area',improve:'Way to Improve'};
+  renderBullets(maps[listKey], listKey, placeholders[listKey]);
+}
+
+function getFormData() {
+  const skillData = {};
+  [...OFFENSE_SKILLS,...DEFENSE_SKILLS,...CHARACTER_SKILLS].forEach(skill => {
+    const prefixes = OFFENSE_SKILLS.includes(skill)?'off':DEFENSE_SKILLS.includes(skill)?'def':'char';
+    const key = prefixes + '_' + skill.replace(/[^a-zA-Z]/g,'_');
+    skillData[skill] = { rating: ratings[key]||0, comment: document.getElementById('cc-'+key)?.value||'' };
+  });
+  skillData['Coachability'] = { rating: ratings['coachability']||0, comment: document.getElementById('cc-coachability')?.value||'' };
+  return {
+    player: document.getElementById('f-player').value,
+    number: document.getElementById('f-number').value,
+    year: document.getElementById('f-year').value,
+    position: document.getElementById('f-position').value,
+    cycle: document.getElementById('f-cycle').value,
+    date: document.getElementById('f-date').value,
+    role: document.getElementById('f-role').value,
+    roleExpand: document.getElementById('f-role-expand').value,
+    stats: {
+      ppg:document.getElementById('s-ppg').value,
+      fg:document.getElementById('s-fg').value,
+      three:document.getElementById('s-3pt').value,
+      ft:document.getElementById('s-ft').value,
+      ast:document.getElementById('s-ast').value,
+      reb:document.getElementById('s-reb').value,
+      stl:document.getElementById('s-stl').value,
+      to:document.getElementById('s-to').value,
+    },
+    skills: skillData,
+    strengthBullets: bulletLists.strength.filter(Boolean),
+    growthBullets: bulletLists.growth.filter(Boolean),
+    improveBullets: bulletLists.improve.filter(Boolean),
+    strengthSummary: document.getElementById('f-strength-summary').value,
+    growthSummary: document.getElementById('f-growth-summary').value,
+    privateNotes: document.getElementById('f-private-notes').value,
+  };
+}
+
+async function saveEvaluation() {
+  const data = getFormData();
+  if (!data.player) { showToast('Select a player first'); return; }
+  const btn = document.querySelector('.save-btn');
+  btn.innerHTML = '<span class="spinner"></span>Saving...';
+  btn.disabled = true;
+  const result = await apiCall({ action:'saveEvaluation', player:data.player, cycle:data.cycle, data:JSON.stringify(data) });
+  btn.innerHTML = 'Save Evaluation ✓';
+  btn.disabled = false;
+  showToast(result.success !== false ? 'Evaluation saved ✓' : 'Error saving — try again');
+}
+
+function previewEvaluation() {
+  const data = getFormData();
+  if (!data.player) { showToast('Select a player first'); return; }
+  sessionStorage.setItem('rams_eval_preview', JSON.stringify(data));
+  window.open('./eval-print.html','_blank');
+}
+
+function clearForm() {
+  if (!confirm('Clear this evaluation?')) return;
+  document.getElementById('eval-main').querySelectorAll('input,textarea,select').forEach(el => {
+    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+  });
+  Object.keys(ratings).forEach(k => { ratings[k] = 0; });
+  initForm();
+  showToast('Form cleared');
+}
+
+async function apiCall(params) {
+  try {
+    const url = SCRIPT_URL + '?' + new URLSearchParams(params).toString();
+    const res = await fetch(url, { method:'GET', redirect:'follow' });
+    const text = await res.text();
+    try { return JSON.parse(text); } catch(e) { return {success:true}; }
+  } catch(e) { return {success:false}; }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>

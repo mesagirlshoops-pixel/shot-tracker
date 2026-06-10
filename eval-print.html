@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rams Player Evaluation</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@page{size:letter;margin:0.6in 0.6in 0.6in 0.6in;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Barlow',sans-serif;color:#1a1a1a;background:white;font-size:11px;line-height:1.5;}
+
+/* HEADER */
+.page-hdr{background:#1a5c2a;color:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;border-radius:4px;}
+.page-hdr-left h1{font-family:'Bebas Neue';font-size:22px;color:#e8b84b;letter-spacing:2px;line-height:1;}
+.page-hdr-left p{font-size:9px;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.page-hdr-right{text-align:right;}
+.player-name{font-family:'Bebas Neue';font-size:28px;color:white;letter-spacing:1px;line-height:1;}
+.player-sub{font-size:10px;color:rgba(255,255,255,.6);margin-top:2px;}
+
+/* STATS */
+.stats-bar{display:flex;gap:4px;margin-bottom:14px;}
+.stat-cell{flex:1;background:#f5f5f5;border-radius:4px;padding:8px 4px;text-align:center;border:1px solid #e8e8e8;}
+.stat-val{font-family:'Bebas Neue';font-size:18px;color:#1a5c2a;line-height:1;}
+.stat-lbl{font-size:8px;color:#888;letter-spacing:1px;text-transform:uppercase;margin-top:1px;font-family:'Barlow Condensed';}
+
+/* TWO COLUMN */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.col-card{background:#fafafa;border:1px solid #e8e8e8;border-radius:4px;overflow:hidden;}
+.col-card-hdr{padding:7px 12px;font-family:'Bebas Neue';font-size:13px;letter-spacing:1px;}
+.col-card-body{padding:10px 12px;}
+.col-card-hdr.green{background:#1a5c2a;color:#e8b84b;}
+.col-card-hdr.gold{background:#c4973a;color:white;}
+.col-card-hdr.blue{background:#1a5c8a;color:white;}
+.col-card-hdr.dark{background:#1a1a1a;color:#e8b84b;}
+
+/* SKILL RATINGS */
+.skill-row{display:flex;align-items:center;padding:4px 0;border-bottom:1px solid #f0f0f0;}
+.skill-row:last-child{border-bottom:none;}
+.skill-label{font-size:10px;font-weight:600;color:#333;flex:1;}
+.skill-rating{display:flex;gap:2px;margin-right:6px;}
+.rating-pip{width:12px;height:12px;border-radius:2px;border:1px solid #ddd;background:#f0f0f0;}
+.rating-pip.filled-1{background:#c0392b;border-color:#c0392b;}
+.rating-pip.filled-2{background:#e67e22;border-color:#e67e22;}
+.rating-pip.filled-3{background:#c4973a;border-color:#c4973a;}
+.rating-pip.filled-4{background:#2d8a42;border-color:#2d8a42;}
+.rating-pip.filled-5{background:#4caf68;border-color:#4caf68;}
+.skill-num{font-family:'Bebas Neue';font-size:14px;color:#1a5c2a;min-width:14px;text-align:right;}
+.skill-comment{font-size:9px;color:#888;font-style:italic;margin-top:1px;padding-left:2px;}
+
+/* BULLETS */
+.bullet-item{display:flex;gap:5px;padding:2px 0;font-size:10px;color:#333;}
+.bullet-dot{color:#1a5c2a;font-weight:700;flex-shrink:0;}
+
+/* SUMMARY */
+.summary-block{background:#fafafa;border:1px solid #e8e8e8;border-radius:4px;overflow:hidden;margin-bottom:14px;}
+.summary-hdr{padding:7px 12px;font-family:'Bebas Neue';font-size:13px;letter-spacing:1px;}
+.summary-body{padding:10px 12px;font-size:10px;color:#333;line-height:1.7;}
+
+/* ROLE */
+.role-block{background:#1a5c2a;color:white;border-radius:4px;padding:10px 14px;margin-bottom:14px;}
+.role-label{font-family:'Barlow Condensed';font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:3px;}
+.role-text{font-size:11px;color:white;line-height:1.5;}
+.role-expand-label{font-family:'Barlow Condensed';font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#e8b84b;margin:8px 0 3px;}
+
+/* FOOTER */
+.page-footer{border-top:1px solid #e8e8e8;padding-top:8px;margin-top:12px;display:flex;justify-content:space-between;align-items:center;}
+.footer-brand{font-family:'Bebas Neue';font-size:12px;color:#1a5c2a;letter-spacing:2px;}
+.footer-sub{font-size:8px;color:#aaa;letter-spacing:1px;text-transform:uppercase;}
+.footer-motto{font-family:'Barlow Condensed';font-size:9px;color:#aaa;letter-spacing:2px;text-transform:uppercase;}
+
+/* PRINT BUTTON */
+.print-controls{text-align:center;padding:20px;background:#f5f5f5;border-bottom:1px solid #ddd;}
+.print-controls button{background:#1a5c2a;color:white;border:none;border-radius:6px;padding:10px 24px;font-family:'Barlow Condensed';font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;margin:0 5px;}
+.print-controls button.back-btn{background:#888;}
+@media print{.print-controls{display:none;} body{font-size:10.5px;}}
+</style>
+</head>
+<body>
+
+<div class="print-controls">
+  <button class="back-btn" onclick="window.close()">← Back to Edit</button>
+  <button onclick="window.print()">🖨 Print / Save as PDF</button>
+</div>
+
+<div id="eval-content" style="padding:0 8px"></div>
+
+<script>
+function getRatingColor(val) {
+  return ['','filled-1','filled-2','filled-3','filled-4','filled-5'][val]||'';
+}
+
+function ratingPips(val) {
+  return [1,2,3,4,5].map(n =>
+    `<div class="rating-pip ${n<=val?getRatingColor(val):''}"></div>`
+  ).join('');
+}
+
+function buildBullets(arr) {
+  if (!arr||!arr.length) return '<div style="color:#aaa;font-size:10px;font-style:italic">None added</div>';
+  return arr.map(b => `<div class="bullet-item"><span class="bullet-dot">•</span><span>${b}</span></div>`).join('');
+}
+
+function render(data) {
+  const s = data.stats || {};
+  const skills = data.skills || {};
+
+  const offenseSkills = ['Offensive IQ','Shooting','Passing','Finishing','Rebounding','Playmaking'];
+  const defenseSkills = ['Defending (Overall)','On-Ball Defense','Off-Ball Anticipation','Functional Strength & Body Control'];
+  const characterSkills = ['Attitude','Communication','Leadership','Effort','Practice Habits'];
+
+  function skillRows(list) {
+    return list.map(name => {
+      const s = skills[name] || {rating:0,comment:''};
+      return `<div class="skill-row">
+        <div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="skill-label">${name}</span>
+            <div class="skill-rating">${ratingPips(s.rating)}</div>
+            <span class="skill-num">${s.rating||'—'}</span>
+          </div>
+          ${s.comment?`<div class="skill-comment">${s.comment}</div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  const coachability = skills['Coachability'] || {rating:0,comment:''};
+
+  document.getElementById('eval-content').innerHTML = `
+    <div class="page-hdr">
+      <div class="page-hdr-left">
+        <h1>🐏 MURRIETA MESA RAMS</h1>
+        <p>Player Development Evaluation · ${data.cycle||''}</p>
+      </div>
+      <div class="page-hdr-right">
+        <div class="player-name">${data.player||'Player Name'}</div>
+        <div class="player-sub">#${data.number||'—'} · ${data.year||''} · ${data.position||''} · ${data.date||''}</div>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      ${[['PPG',s.ppg],['FG%',s.fg],['3PT%',s.three],['FT%',s.ft],['AST/G',s.ast],['REB/G',s.reb],['STL/G',s.stl],['TO/G',s.to]]
+        .map(([l,v])=>`<div class="stat-cell"><div class="stat-val">${v||'—'}</div><div class="stat-lbl">${l}</div></div>`).join('')}
+    </div>
+
+    ${data.role ? `<div class="role-block">
+      <div class="role-label">Role on Team</div>
+      <div class="role-text">${data.role}</div>
+      ${data.roleExpand?`<div class="role-expand-label">How Role Can Expand</div><div class="role-text">${data.roleExpand}</div>`:''}
+    </div>` : ''}
+
+    <div class="two-col">
+      <div class="col-card">
+        <div class="col-card-hdr green">Offense</div>
+        <div class="col-card-body">${skillRows(offenseSkills)}</div>
+      </div>
+      <div class="col-card">
+        <div class="col-card-hdr blue">Defense</div>
+        <div class="col-card-body">${skillRows(defenseSkills)}</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="col-card">
+        <div class="col-card-hdr dark">Character & Intangibles</div>
+        <div class="col-card-body">${skillRows(characterSkills)}</div>
+      </div>
+      <div class="col-card">
+        <div class="col-card-hdr gold">Coachability</div>
+        <div class="col-card-body">
+          <div class="skill-row" style="border:none">
+            <div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <div class="skill-rating">${ratingPips(coachability.rating)}</div>
+                <span class="skill-num" style="font-size:22px">${coachability.rating||'—'}</span>
+                <span style="font-size:10px;color:#666">/ 5</span>
+              </div>
+              ${coachability.comment?`<div class="skill-comment" style="font-size:10px;margin-top:6px">${coachability.comment}</div>`:''}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="summary-block">
+        <div class="summary-hdr green" style="background:#1a5c2a;color:#e8b84b">Strengths</div>
+        <div class="col-card-body">${buildBullets(data.strengthBullets)}</div>
+        ${data.strengthSummary?`<div class="summary-body" style="border-top:1px solid #e8e8e8">${data.strengthSummary}</div>`:''}
+      </div>
+      <div class="summary-block">
+        <div class="summary-hdr" style="background:#c0392b;color:white">Growth Areas</div>
+        <div class="col-card-body">${buildBullets(data.growthBullets)}</div>
+        ${data.growthSummary?`<div class="summary-body" style="border-top:1px solid #e8e8e8">${data.growthSummary}</div>`:''}
+      </div>
+    </div>
+
+    ${data.improveBullets&&data.improveBullets.length ? `
+    <div class="summary-block" style="margin-bottom:14px">
+      <div class="summary-hdr" style="background:#1a5c8a;color:white">Ways to Improve</div>
+      <div class="col-card-body">${buildBullets(data.improveBullets)}</div>
+    </div>` : ''}
+
+    <div class="page-footer">
+      <div>
+        <div class="footer-brand">MURRIETA MESA RAMS</div>
+        <div class="footer-sub">Varsity Girls Basketball · 2026–27</div>
+      </div>
+      <div class="footer-motto">Character · Community · Championships</div>
+    </div>`;
+}
+
+const stored = sessionStorage.getItem('rams_eval_preview');
+if (stored) {
+  try { render(JSON.parse(stored)); }
+  catch(e) { document.getElementById('eval-content').innerHTML = '<p style="padding:20px;color:red">Error loading evaluation data</p>'; }
+} else {
+  document.getElementById('eval-content').innerHTML = '<p style="padding:20px;color:#888">No evaluation data found. Go back and fill out the evaluation form first.</p>';
+}
+</script>
+</body>
+</html>
