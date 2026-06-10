@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rams Development">
+<title>Rams Player Development — Self-Discovery</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f5f0;--card:#ffffff;--border:#e8e0d0;--border2:#f0ebe0;
+  --green:#1a5c2a;--gmid:#2d8a42;--gbright:#4caf68;--gdark:#0f3518;
+  --gold:#c4973a;--gold-l:#e8b84b;--gold-d:#8a6820;
+  --text:#1a1a14;--dim:#7a7060;--bright:#0f1a0f;
+  --red:#c0392b;--blue:#1a5c8a;
+  --accent:#c4973a;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);min-height:100vh;}
+
+/* HEADER */
+.hdr{background:var(--gdark);padding:0;overflow:hidden;position:relative;}
+.hdr-inner{padding:28px 20px 24px;position:relative;z-index:2;}
+.hdr::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--gdark) 60%,rgba(196,151,58,.15));z-index:1;}
+.hdr-cycle{font-family:'Barlow Condensed';font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;position:relative;z-index:2;}
+.hdr h1{font-family:'Bebas Neue';font-size:28px;color:#f0ede8;letter-spacing:2px;line-height:1;margin-bottom:4px;position:relative;z-index:2;}
+.hdr p{font-size:12px;color:rgba(255,255,255,.45);line-height:1.6;position:relative;z-index:2;}
+
+/* PROGRESS */
+.progress-wrap{background:var(--gdark);padding:0 20px 16px;position:relative;z-index:2;}
+.progress-track{height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s ease;}
+.progress-label{display:flex;justify-content:space-between;margin-bottom:8px;}
+.progress-label span{font-family:'Barlow Condensed';font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);}
+.progress-label strong{font-family:'Barlow Condensed';font-size:10px;letter-spacing:1px;color:var(--gold);}
+
+/* PLAYER SELECT */
+.player-select-screen{padding:20px 16px;}
+.select-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px 20px;margin-bottom:14px;}
+.select-card h2{font-family:'Bebas Neue';font-size:22px;color:var(--green);letter-spacing:1px;margin-bottom:6px;}
+.select-card p{font-size:13px;color:var(--dim);line-height:1.7;margin-bottom:20px;}
+.name-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.name-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:12px 10px;text-align:center;cursor:pointer;transition:all .12s;}
+.name-btn.selected{background:var(--green);border-color:var(--green);}
+.name-btn.selected span{color:white;}
+.name-btn span{font-size:14px;font-weight:600;color:var(--text);}
+.cycle-select{margin-bottom:16px;}
+.cycle-select label{font-family:'Barlow Condensed';font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:8px;}
+.cycle-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.cycle-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:6px;padding:8px 14px;font-family:'Barlow Condensed';font-size:12px;font-weight:700;letter-spacing:1px;color:var(--dim);cursor:pointer;}
+.cycle-btn.selected{background:var(--gold);border-color:var(--gold);color:var(--gdark);}
+.btn-begin{width:100%;background:var(--green);color:white;border:none;border-radius:10px;padding:15px;font-family:'Barlow Condensed';font-size:16px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;}
+.btn-begin:disabled{opacity:.3;}
+
+/* QUESTIONNAIRE */
+.q-screen{display:none;padding:0 0 40px;}
+.section-banner{background:var(--green);padding:14px 20px;display:flex;align-items:center;gap:12px;margin-bottom:0;}
+.section-banner .sec-num{font-family:'Bebas Neue';font-size:32px;color:rgba(255,255,255,.2);line-height:1;}
+.section-banner .sec-info{}
+.section-banner .sec-label{font-family:'Barlow Condensed';font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;}
+.section-banner .sec-title{font-family:'Bebas Neue';font-size:18px;color:white;letter-spacing:1px;line-height:1;}
+.question-card{background:var(--card);border-bottom:1px solid var(--border2);padding:22px 20px;}
+.q-number{font-family:'Barlow Condensed';font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.q-text{font-size:15px;font-weight:600;color:var(--bright);line-height:1.6;margin-bottom:4px;}
+.q-subtext{font-size:12px;color:var(--dim);line-height:1.6;margin-bottom:14px;font-style:italic;}
+/* Multiple choice */
+.mc-options{display:flex;flex-direction:column;gap:8px;}
+.mc-option{display:flex;align-items:flex-start;gap:10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .12s;}
+.mc-option.selected{background:rgba(26,92,42,.06);border-color:var(--green);}
+.mc-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:1px;transition:all .12s;display:flex;align-items:center;justify-content:center;}
+.mc-option.selected .mc-dot{border-color:var(--green);background:var(--green);}
+.mc-dot::after{content:'';width:6px;height:6px;border-radius:50%;background:white;opacity:0;}
+.mc-option.selected .mc-dot::after{opacity:1;}
+.mc-label{font-size:13px;color:var(--text);line-height:1.5;}
+.mc-option.selected .mc-label{color:var(--green);font-weight:600;}
+/* Open text */
+.open-textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.7;resize:none;min-height:100px;outline:none;font-family:'Barlow';transition:border-color .12s;}
+.open-textarea:focus{border-color:var(--green);}
+.open-textarea::placeholder{color:var(--dim);font-style:italic;}
+/* Rating */
+.rating-row{display:flex;gap:8px;margin-bottom:8px;}
+.rating-btn{flex:1;padding:10px 4px;border:1.5px solid var(--border);border-radius:6px;background:var(--bg);font-family:'Bebas Neue';font-size:18px;color:var(--dim);cursor:pointer;text-align:center;transition:all .12s;}
+.rating-btn.selected{background:var(--green);border-color:var(--green);color:white;}
+.rating-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);font-family:'Barlow Condensed';letter-spacing:1px;}
+/* Hybrid: MC + open */
+.open-followup{margin-top:10px;}
+.open-followup label{font-size:11px;font-weight:700;color:var(--dim);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px;font-family:'Barlow Condensed';}
+
+/* NAVIGATION */
+.q-nav{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--border);padding:12px 20px;display:flex;gap:10px;z-index:50;}
+.nav-back{flex:1;background:transparent;border:1.5px solid var(--border);border-radius:8px;padding:13px;font-family:'Barlow Condensed';font-size:14px;font-weight:700;letter-spacing:1px;color:var(--dim);cursor:pointer;}
+.nav-next{flex:2;background:var(--green);border:none;border-radius:8px;padding:13px;font-family:'Barlow Condensed';font-size:14px;font-weight:700;letter-spacing:2px;color:white;cursor:pointer;text-transform:uppercase;}
+.nav-next:disabled{opacity:.3;}
+.nav-submit{flex:2;background:var(--gold);border:none;border-radius:8px;padding:13px;font-family:'Barlow Condensed';font-size:14px;font-weight:700;letter-spacing:2px;color:var(--gdark);cursor:pointer;text-transform:uppercase;}
+
+/* COMPLETE SCREEN */
+.complete-screen{display:none;padding:32px 20px;text-align:center;}
+.complete-icon{font-size:56px;margin-bottom:16px;}
+.complete-screen h2{font-family:'Bebas Neue';font-size:28px;color:var(--green);letter-spacing:2px;margin-bottom:8px;}
+.complete-screen p{font-size:13px;color:var(--dim);line-height:1.8;margin-bottom:20px;}
+.complete-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;text-align:left;}
+.complete-card h3{font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.complete-card p{font-size:13px;color:var(--dim);line-height:1.7;}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:white;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-cycle" id="hdr-cycle">Summer 2026 · Self-Discovery</div>
+    <h1>WHO DO YOU WANT TO BECOME?</h1>
+    <p>This isn't a form. It's a conversation with yourself.<br>Answer honestly — no one is grading you.</p>
+  </div>
+  <div class="progress-wrap" id="progress-wrap" style="display:none">
+    <div class="progress-label">
+      <span id="progress-section">Section 1 of 6</span>
+      <strong id="progress-pct">0%</strong>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- PLAYER SELECT -->
+<div id="player-select-screen" class="player-select-screen">
+  <div class="select-card">
+    <h2>Let's Get Started</h2>
+    <p>This questionnaire takes 20–30 minutes to complete honestly. Find a quiet place. Your answers go directly to Coach Rudy and are between you and him.</p>
+    <div style="font-family:'Barlow Condensed';font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:8px;">Your Name</div>
+    <div class="name-grid" id="name-grid"></div>
+    <div class="cycle-select">
+      <label>Cycle</label>
+      <div class="cycle-btns">
+        <div class="cycle-btn selected" onclick="selectCycle('Summer 2026',this)">Summer 2026</div>
+        <div class="cycle-btn" onclick="selectCycle('Preseason 2026',this)">Preseason 2026</div>
+        <div class="cycle-btn" onclick="selectCycle('Post-Season 2027',this)">Post-Season 2027</div>
+      </div>
+    </div>
+    <button class="btn-begin" id="btn-begin" disabled onclick="beginQuestionnaire()">Begin →</button>
+  </div>
+</div>
+
+<!-- QUESTIONNAIRE -->
+<div id="q-screen" class="q-screen">
+  <div id="q-content"></div>
+  <div class="q-nav">
+    <button class="nav-back" id="nav-back" onclick="prevSection()" style="display:none">← Back</button>
+    <button class="nav-next" id="nav-next" onclick="nextSection()">Next →</button>
+    <button class="nav-submit" id="nav-submit" onclick="submitQuestionnaire()" style="display:none">Submit ✓</button>
+  </div>
+</div>
+
+<!-- COMPLETE -->
+<div id="complete-screen" class="complete-screen">
+  <div class="complete-icon">🐏</div>
+  <h2>Done. Now the real work starts.</h2>
+  <p>Your answers have been submitted to Coach Rudy. He'll review them before your 1-on-1 conversation. Come ready to talk.</p>
+  <div class="complete-card">
+    <h3>What happens next</h3>
+    <p>Coach Rudy will complete his evaluation of your game independently. Then you'll meet — you'll see his evaluation, he'll have read your answers, and the conversation starts from there.</p>
+  </div>
+  <div class="complete-card">
+    <h3>Remember</h3>
+    <p>Most goals are never fully obtained. The gap between where you are and where you want to be never fully closes. That's not failure — that's the point. The pursuit is what builds you.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz3C3k33Utkn54wwvKIemnnMNPlQuUkEGQYgfpq3Tzy7wAgkWRFw65cjyueD-aee7H8/exec';
+
+const VARSITY_PLAYERS = ['Moana','Jazae','Josephine','Malia','Alise','Khloe','Naomi','Daney','Kylynn','Serena','Aly','Anela'];
+
+const SECTIONS = [
+  {
+    num:'1', label:'Warm Up', title:'Who You Are Right Now',
+    questions:[
+      {
+        id:'q1', type:'mc', num:'Question 1 of 20',
+        text:'Right now, basketball feels like...',
+        sub:'Pick the one that is most honest — not the one that sounds best.',
+        options:[
+          'Something I love and cannot imagine life without',
+          'Something I am competitive about and want to be great at',
+          'Something I am still figuring out how much I care about',
+          'Something I do but I am not sure where it fits in my life'
+        ]
+      },
+      {
+        id:'q2', type:'mc', num:'Question 2 of 20',
+        text:'When I think about this season, I feel...',
+        sub:'Be honest with yourself.',
+        options:[
+          'Excited — I am ready and I believe in what we are building',
+          'Motivated but nervous — I know what I need to prove',
+          'Uncertain — I am not sure where I stand or what to expect',
+          'Pressured — there is a lot expected of me'
+        ]
+      },
+      {
+        id:'q3', type:'mc', num:'Question 3 of 20',
+        text:'The area I most need to grow in is...',
+        options:[
+          'My basketball skills — I need to get better at the game',
+          'My mental toughness — I need to compete harder',
+          'My leadership and teamwork — I need to show up more for my teammates',
+          'My consistency and daily discipline — I need to do the work even when I do not feel like it'
+        ]
+      }
+    ]
+  },
+  {
+    num:'2', label:'Your Why', title:'The Foundation',
+    questions:[
+      {
+        id:'q4', type:'open', num:'Question 4 of 20',
+        text:'Why do you really play basketball?',
+        sub:'Not the answer that sounds good — the honest one. Is it for you? For others? For the competition? For the future? For the social experience? There is no wrong answer here — but there is an honest one. What is it?',
+        placeholder:'Take your time with this one. Write what is actually true for you...'
+      },
+      {
+        id:'q5', type:'open', num:'Question 5 of 20',
+        text:'When the game gets hard — when you are down, when you make mistakes, when the pressure is high — what do you actually do?',
+        sub:'Not what you wish you did. Not what sounds good. What do you actually do in those moments?',
+        placeholder:'Be honest. No one becomes better by pretending to be something they are not yet...'
+      }
+    ]
+  },
+  {
+    num:'3', label:'Your Game', title:'Honest Self-Assessment',
+    questions:[
+      {
+        id:'q6', type:'open', num:'Question 6 of 20',
+        text:'The best version of me as a basketball player looks like...',
+        sub:'Be specific. Not "I want to be great." What does great actually look like for you on the court?',
+        placeholder:'Describe her specifically — what she does, how she plays, how she carries herself...'
+      },
+      {
+        id:'q7', type:'open', num:'Question 7 of 20',
+        text:'My biggest strength on the court right now is ___. My biggest weakness that I am honest with myself about is ___.',
+        sub:'What has stopped you from improving that weakness so far? Be real — the answer reveals more than the weakness itself.',
+        placeholder:'Strength: ...\n\nWeakness: ...\n\nWhat has stopped me from fixing it: ...'
+      },
+      {
+        id:'q8', type:'open', num:'Question 8 of 20',
+        text:'Think about your average Tuesday — not game day, not a big practice, just a regular day.',
+        sub:'Does your average Tuesday match the player you say you want to become? What does it actually look like right now — and what would it look like if you were fully committed?',
+        placeholder:'My average Tuesday right now looks like...\n\nIf I was fully committed, it would look like...'
+      }
+    ]
+  },
+  {
+    num:'4', label:'Your Goals', title:'What You Are Building Toward',
+    questions:[
+      {
+        id:'q9', type:'open', num:'Question 9 of 20',
+        text:'By the end of this summer I want to be able to say I...',
+        sub:'One specific, measurable thing you committed to and followed through on. Not a feeling — an action or result.',
+        placeholder:'By the end of summer I will have...'
+      },
+      {
+        id:'q10', type:'open', num:'Question 10 of 20',
+        text:'By the end of this season I want our team to ___. My personal role in making that happen will be...',
+        placeholder:'Team goal: ...\n\nMy role: ...'
+      },
+      {
+        id:'q11', type:'open', num:'Question 11 of 20',
+        text:'By the time I finish playing at Murrieta Mesa, I want to be known as a player who...',
+        sub:'Not just a scorer or a defender. A player who — what kind of player and person do you want to have been?',
+        placeholder:'I want to be known as someone who...'
+      },
+      {
+        id:'q12', type:'open', num:'Question 12 of 20',
+        text:'Beyond high school — whether that is college basketball or not — my honest vision for myself is...',
+        sub:'What do you actually want? Not what sounds impressive. Not what you think you should want. What do you really want your life to look like?',
+        placeholder:'My honest vision is...'
+      },
+      {
+        id:'q13', type:'open', num:'Question 13 of 20',
+        text:'Most goals are never fully obtained. The gap between where you are and where you want to be never fully closes.',
+        sub:'Knowing that — what goal are you still willing to chase anyway? Why is the pursuit worth it even if you never fully arrive?',
+        placeholder:'The goal I am willing to chase anyway is...\n\nIt is worth it because...'
+      }
+    ]
+  },
+  {
+    num:'5', label:'Your Character', title:'Who You Are Beyond Basketball',
+    questions:[
+      {
+        id:'q14', type:'hybrid', num:'Question 14 of 20',
+        text:'The teammate I want to be is someone who...',
+        sub:'Finish that sentence. Then honestly rate yourself — how consistently are you actually that teammate right now?',
+        placeholder:'The teammate I want to be is someone who...',
+        followup:'What gets in the way of being that teammate consistently?',
+        followupPlaceholder:'What gets in the way...'
+      },
+      {
+        id:'q15', type:'hybrid', num:'Question 15 of 20',
+        text:'Leadership and communication are skills — not personality traits. They can be developed.',
+        sub:'How would you honestly describe yourself in both right now?',
+        placeholder:'My honest assessment of my leadership right now is...\n\nMy honest assessment of my communication is...',
+        followup:'What is one thing you could do differently starting today?',
+        followupPlaceholder:'One thing I could do differently...'
+      },
+      {
+        id:'q16', type:'open', num:'Question 16 of 20',
+        text:'Effort and attitude are the two things entirely in your control every single day.',
+        sub:'Honestly — how consistent are you with both? What does your best day look like versus your worst day?',
+        placeholder:'My best day looks like...\n\nMy worst day looks like...\n\nHow consistent I am: ...'
+      },
+      {
+        id:'q17', type:'mc_open', num:'Question 17 of 20',
+        text:'Every team has tension — between players, about roles, about playing time.',
+        sub:'When conflict or tension exists, your honest default is...',
+        options:[
+          'I avoid it and hope it resolves itself',
+          'I address it directly with the person',
+          'I bring it to a coach when I am ready',
+          'I let it affect my play and attitude more than I would like to admit'
+        ],
+        followup:'What would handling it the right way look like for you?',
+        followupPlaceholder:'The right way for me to handle it would be...'
+      },
+      {
+        id:'q18', type:'mc_open', num:'Question 18 of 20',
+        text:'When you disagree with a coach — about playing time, a decision, feedback you received — your honest default is...',
+        options:[
+          'I stay quiet and internalize it',
+          'I talk to my parents or friends about it first',
+          'I bring it directly to the coach when I am ready',
+          'I let it affect my effort or attitude'
+        ],
+        followup:'What does a healthy player-coach relationship look like to you — and what is YOUR responsibility in building that?',
+        followupPlaceholder:'A healthy player-coach relationship to me looks like...\n\nMy responsibility in building it is...'
+      },
+      {
+        id:'q19', type:'open', num:'Question 19 of 20',
+        text:'What is one thing about your character — not your basketball — that you want to develop this year?',
+        sub:'Why does it matter to you?',
+        placeholder:'The character trait I want to develop is...\n\nIt matters to me because...'
+      }
+    ]
+  },
+  {
+    num:'6', label:'The Commitment', title:'Where It All Lands',
+    questions:[
+      {
+        id:'q20', type:'open', num:'Question 20 of 20',
+        text:'After everything you just answered — what do you want Coach Rudy to know about you as a player and as a person that he might not already know? And what is the one thing you are genuinely committed to changing this year?',
+        sub:'This is the most important answer you will write. Take your time.',
+        placeholder:'What I want Coach to know is...\n\nThe one thing I am committed to changing is...'
+      }
+    ]
+  }
+];
+
+let currentPlayer = null;
+let currentCycle = 'Summer 2026';
+let currentSection = 0;
+let answers = {};
+
+// BUILD LOGIN
+function buildLogin() {
+  document.getElementById('name-grid').innerHTML = VARSITY_PLAYERS.map(name =>
+    `<div class="name-btn" onclick="selectPlayer('${name}',this)"><span>${name}</span></div>`
+  ).join('');
+}
+
+function selectPlayer(name, el) {
+  currentPlayer = name;
+  document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn-begin').disabled = false;
+  document.getElementById('btn-begin').textContent = `Begin ${name}'s Questionnaire →`;
+}
+
+function selectCycle(cycle, el) {
+  currentCycle = cycle;
+  document.querySelectorAll('.cycle-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('hdr-cycle').textContent = cycle + ' · Self-Discovery';
+}
+
+function beginQuestionnaire() {
+  if (!currentPlayer) return;
+  document.getElementById('player-select-screen').style.display = 'none';
+  document.getElementById('q-screen').style.display = 'block';
+  document.getElementById('progress-wrap').style.display = 'block';
+  renderSection(0);
+}
+
+// RENDER SECTION
+function renderSection(idx) {
+  currentSection = idx;
+  const sec = SECTIONS[idx];
+  const isLast = idx === SECTIONS.length - 1;
+  const isFirst = idx === 0;
+  updateProgress();
+
+  let html = `<div class="section-banner">
+    <div class="sec-num">${sec.num}</div>
+    <div class="sec-info">
+      <div class="sec-label">${sec.label}</div>
+      <div class="sec-title">${sec.title}</div>
+    </div>
+  </div>`;
+
+  sec.questions.forEach(q => {
+    html += `<div class="question-card" id="qc-${q.id}">
+      <div class="q-number">${q.num}</div>
+      <div class="q-text">${q.text}</div>
+      ${q.sub ? `<div class="q-subtext">${q.sub}</div>` : ''}`;
+
+    if (q.type === 'mc') {
+      html += `<div class="mc-options">` +
+        q.options.map((opt, i) =>
+          `<div class="mc-option ${answers[q.id] === opt ? 'selected' : ''}" onclick="selectMC('${q.id}','${opt.replace(/'/g,"\\'")}',this)">
+            <div class="mc-dot"></div>
+            <div class="mc-label">${opt}</div>
+          </div>`
+        ).join('') + `</div>`;
+    } else if (q.type === 'open') {
+      html += `<textarea class="open-textarea" id="ta-${q.id}" placeholder="${q.placeholder || ''}" oninput="saveText('${q.id}',this.value)">${answers[q.id] || ''}</textarea>`;
+    } else if (q.type === 'hybrid') {
+      html += `<textarea class="open-textarea" id="ta-${q.id}" placeholder="${q.placeholder || ''}" oninput="saveText('${q.id}',this.value)">${answers[q.id] || ''}</textarea>
+        <div class="open-followup">
+          <label>${q.followup}</label>
+          <textarea class="open-textarea" id="ta-${q.id}_follow" placeholder="${q.followupPlaceholder || ''}" oninput="saveText('${q.id}_follow',this.value)" style="min-height:70px">${answers[q.id+'_follow'] || ''}</textarea>
+        </div>`;
+    } else if (q.type === 'mc_open') {
+      html += `<div class="mc-options">` +
+        q.options.map(opt =>
+          `<div class="mc-option ${answers[q.id] === opt ? 'selected' : ''}" onclick="selectMC('${q.id}','${opt.replace(/'/g,"\\'")}',this)">
+            <div class="mc-dot"></div>
+            <div class="mc-label">${opt}</div>
+          </div>`
+        ).join('') + `</div>`;
+      if (q.followup) {
+        html += `<div class="open-followup" style="margin-top:12px">
+          <label>${q.followup}</label>
+          <textarea class="open-textarea" id="ta-${q.id}_follow" placeholder="${q.followupPlaceholder || ''}" oninput="saveText('${q.id}_follow',this.value)" style="min-height:80px">${answers[q.id+'_follow'] || ''}</textarea>
+        </div>`;
+      }
+    }
+    html += `</div>`;
+  });
+
+  document.getElementById('q-content').innerHTML = html;
+  document.getElementById('nav-back').style.display = isFirst ? 'none' : 'block';
+  document.getElementById('nav-next').style.display = isLast ? 'none' : 'block';
+  document.getElementById('nav-submit').style.display = isLast ? 'block' : 'none';
+  window.scrollTo(0, 0);
+}
+
+function selectMC(qId, val, el) {
+  answers[qId] = val;
+  const parent = el.parentElement;
+  parent.querySelectorAll('.mc-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function saveText(qId, val) {
+  answers[qId] = val;
+}
+
+function nextSection() {
+  if (currentSection < SECTIONS.length - 1) {
+    renderSection(currentSection + 1);
+  }
+}
+
+function prevSection() {
+  if (currentSection > 0) {
+    renderSection(currentSection - 1);
+  }
+}
+
+function updateProgress() {
+  const pct = Math.round((currentSection / SECTIONS.length) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-section').textContent = `Section ${currentSection + 1} of ${SECTIONS.length}`;
+}
+
+async function submitQuestionnaire() {
+  const btn = document.getElementById('nav-submit');
+  btn.innerHTML = '<span class="spinner"></span>Submitting...';
+  btn.disabled = true;
+
+  const payload = {
+    action: 'saveQuestionnaire',
+    player: currentPlayer,
+    cycle: currentCycle,
+    date: new Date().toISOString().slice(0,10),
+    answers: JSON.stringify(answers)
+  };
+
+  const result = await apiCall(payload);
+  if (result.success !== false) {
+    document.getElementById('q-screen').style.display = 'none';
+    document.getElementById('complete-screen').style.display = 'block';
+    document.getElementById('progress-wrap').style.display = 'none';
+    window.scrollTo(0,0);
+  } else {
+    btn.innerHTML = 'Submit ✓';
+    btn.disabled = false;
+    showToast('Error submitting — try again');
+  }
+}
+
+async function apiCall(params) {
+  try {
+    const url = SCRIPT_URL + '?' + new URLSearchParams(params).toString();
+    const res = await fetch(url, { method: 'GET', redirect: 'follow' });
+    const text = await res.text();
+    try { return JSON.parse(text); } catch(e) { return {success:true}; }
+  } catch(e) { return {success:false,error:e.toString()}; }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+buildLogin();
+</script>
+</body>
+</html>
